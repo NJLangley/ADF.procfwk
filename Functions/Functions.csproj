@@ -10,7 +10,7 @@
     <PackageReference Include="Microsoft.Azure.Management.ResourceManager" Version="3.7.2-preview" />
     <PackageReference Include="Microsoft.Azure.Management.Synapse" Version="1.0.0-preview.1" />
     <PackageReference Include="Microsoft.Azure.Synapse" Version="0.1.0-preview" />
-    <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="5.2.7" />
+    <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="5.2.8" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.7" />
   </ItemGroup>
   <ItemGroup>
