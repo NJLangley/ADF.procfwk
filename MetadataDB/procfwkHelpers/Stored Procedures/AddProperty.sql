@@ -96,7 +96,10 @@ BEGIN
 			--for new entry of existing record
 			OUTPUT
 				$action AS [Action],
-				sourceTable.*
+				sourceTable.[PropertyName]
+       ,sourceTable.[PropertyValue]
+       ,IsNull(sourceTable.[Description], Deleted.[Description]) AS [Description]
+       ,sourceTable.[StartEndDate]
 			) AS MergeOutput
 		WHERE
 			MergeOutput.[Action] = 'UPDATE';
