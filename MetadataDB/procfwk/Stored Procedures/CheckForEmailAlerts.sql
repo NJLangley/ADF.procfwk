@@ -1,6 +1,7 @@
-﻿CREATE PROCEDURE [procfwk].[CheckForEmailAlerts]
+﻿CREATE   PROCEDURE [procfwk].[CheckForEmailAlerts]
 	(
-	@PipelineId INT
+	@PipelineId INT,
+  @BatchId INT
 	)
 AS
 BEGIN
@@ -28,6 +29,7 @@ BEGIN
 				INNER JOIN procfwk.Recipients AS r
 					ON r.RecipientId = pal.RecipientId
 				WHERE ce.PipelineId = @PipelineId
+            AND ce.BatchId = @BatchId
 					  AND ao.BitValue & pal.OutcomesBitValue > 0
 					  AND pal.[Enabled] = 1
 					  AND r.[Enabled] = 1

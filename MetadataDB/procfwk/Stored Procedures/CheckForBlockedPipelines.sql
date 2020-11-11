@@ -1,6 +1,7 @@
-﻿CREATE PROCEDURE [procfwk].[CheckForBlockedPipelines]
+﻿CREATE   PROCEDURE [procfwk].[CheckForBlockedPipelines]
 	(
 	@ExecutionId UNIQUEIDENTIFIER,
+  @BatchId INT,
 	@StageId INT
 	)
 AS
@@ -23,6 +24,7 @@ BEGIN
 					[procfwk].[CurrentExecution]
 				WHERE 
 					[LocalExecutionId] = @ExecutionId
+          AND [BatchId] = @BatchId
 					AND [StageId] = @StageId
 					AND [IsBlocked] = 1
 				)
@@ -44,6 +46,7 @@ BEGIN
 					[procfwk].[CurrentExecution]
 				WHERE 
 					[LocalExecutionId] = @ExecutionId
+          AND [BatchId] = @BatchId
 					AND [StageId] = @StageId
 					AND [IsBlocked] = 1
 				)
@@ -58,6 +61,7 @@ BEGIN
 												[procfwk].[CurrentExecution] 
 											WHERE 
 												[LocalExecutionId] = @ExecutionId
+                        AND [BatchId] = @BatchId
 												AND [StageId] = @StageId 
 												AND [IsBlocked] = 1
 
@@ -68,6 +72,7 @@ BEGIN
 					BEGIN 
 						EXEC [procfwk].[SetExecutionBlockDependants]
 							@ExecutionId = @ExecutionId,
+              @BatchId = @BatchId,
 							@PipelineId = @PipelineId;
 						
 						FETCH NEXT FROM @Cursor INTO @PipelineId;

@@ -1,6 +1,7 @@
-﻿CREATE PROCEDURE [procfwk].[SetLogActivityFailed]
+﻿CREATE   PROCEDURE [procfwk].[SetLogActivityFailed]
 	(
 	@ExecutionId UNIQUEIDENTIFIER,
+  @BatchId INT,
 	@StageId INT,
 	@PipelineId INT,
 	@CallingActivity VARCHAR(255)
@@ -17,13 +18,15 @@ BEGIN
 		[PipelineStatus] = @CallingActivity + 'Error'
 	WHERE
 		[LocalExecutionId] = @ExecutionId
-		AND [StageId] = @StageId
+    AND [BatchId] = @BatchId
+    AND [StageId] = @StageId
 		AND [PipelineId] = @PipelineId
 
 	--persist failed pipeline records to long term log
 	INSERT INTO [procfwk].[ExecutionLog]
 		(
 		[LocalExecutionId],
+    [BatchId],
 		[StageId],
 		[PipelineId],
 		[CallingDataFactoryName],
@@ -38,6 +41,7 @@ BEGIN
 		)
 	SELECT
 		[LocalExecutionId],
+    [BatchId],
 		[StageId],
 		[PipelineId],
 		[CallingDataFactoryName],
@@ -53,6 +57,7 @@ BEGIN
 		[procfwk].[CurrentExecution]
 	WHERE
 		[PipelineStatus] = @CallingActivity + 'Error'
+    AND [BatchId] = @BatchId
 		AND [StageId] = @StageId
 		AND [PipelineId] = @PipelineId
 	
@@ -73,6 +78,7 @@ BEGIN
 				[IsBlocked] = 1
 			WHERE
 				[LocalExecutionId] = @ExecutionId
+        AND [BatchId] = @BatchId
 				AND [StageId] > @StageId;
 		END;
 	
@@ -80,6 +86,7 @@ BEGIN
 		BEGIN
 			EXEC [procfwk].[SetExecutionBlockDependants]
 				@ExecutionId = @ExecutionId,
+        @BatchId = @BatchId,
 				@PipelineId = @PipelineId
 		END;
 	ELSE

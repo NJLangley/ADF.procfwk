@@ -1,6 +1,7 @@
-﻿CREATE PROCEDURE [procfwk].[SetLogPipelineRunId]
+﻿CREATE   PROCEDURE [procfwk].[SetLogPipelineRunId]
 	(
 	@ExecutionId UNIQUEIDENTIFIER,
+  @BatchId INT,
 	@StageId INT,
 	@PipelineId INT,
 	@RunId UNIQUEIDENTIFIER = NULL
@@ -15,6 +16,7 @@ BEGIN
 		[AdfPipelineRunId] = LOWER(@RunId)
 	WHERE
 		[LocalExecutionId] = @ExecutionId
+    AND [BatchId] = @BatchId
 		AND [StageId] = @StageId
 		AND [PipelineId] = @PipelineId
 END;

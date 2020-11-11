@@ -1,6 +1,7 @@
-﻿CREATE PROCEDURE [procfwk].[GetEmailAlertParts]
+﻿CREATE   PROCEDURE [procfwk].[GetEmailAlertParts]
 	(
-	@PipelineId INT
+	@PipelineId INT,
+  @BatchId INT
 	)
 AS
 BEGIN
@@ -22,7 +23,8 @@ BEGIN
 		INNER JOIN [procfwk].[AlertOutcomes] ao
 			ON ce.[PipelineStatus] = ao.[PipelineOutcomeStatus]
 	WHERE
-		ce.[PipelineId] = @PipelineId;
+		ce.[PipelineId] = @PipelineId
+    AND ce.[BatchId] = @BatchId;
 
 	--get to recipients
 	SELECT
@@ -95,33 +97,37 @@ BEGIN
 		@EmailSubject = 'ADFprocfwk Alert: ' + [PipelineName] + ' - ' + [PipelineStatus],
 	
 		--body
-		@EmailBody = REPLACE(@EmailBody,'##PipelineName###',[PipelineName]),
-		@EmailBody = REPLACE(@EmailBody,'##Status###',[PipelineStatus]),
-		@EmailBody = REPLACE(@EmailBody,'##ExecId###',CAST([LocalExecutionId] AS VARCHAR(36))),
-		@EmailBody = REPLACE(@EmailBody,'##RunId###',CAST([AdfPipelineRunId] AS VARCHAR(36))),
-		@EmailBody = REPLACE(@EmailBody,'##StartDateTime###',CONVERT(VARCHAR(30), [StartDateTime], 120)),
+    @EmailBody = REPLACE(@EmailBody,'##BatchName###',b.[BatchName]),
+		@EmailBody = REPLACE(@EmailBody,'##PipelineName###',ce.[PipelineName]),
+		@EmailBody = REPLACE(@EmailBody,'##Status###',ce.[PipelineStatus]),
+		@EmailBody = REPLACE(@EmailBody,'##ExecId###',CAST(ce.[LocalExecutionId] AS VARCHAR(36))),
+		@EmailBody = REPLACE(@EmailBody,'##RunId###',CAST(ce.[AdfPipelineRunId] AS VARCHAR(36))),
+		@EmailBody = REPLACE(@EmailBody,'##StartDateTime###',CONVERT(VARCHAR(30), ce.[StartDateTime], 120)),
 		@EmailBody = CASE
-						WHEN [EndDateTime] IS NULL THEN REPLACE(@EmailBody,'##EndDateTime###','N/A')
-						ELSE REPLACE(@EmailBody,'##EndDateTime###',CONVERT(VARCHAR(30), [EndDateTime], 120))
+						WHEN ce.[EndDateTime] IS NULL THEN REPLACE(@EmailBody,'##EndDateTime###','N/A')
+						ELSE REPLACE(@EmailBody,'##EndDateTime###',CONVERT(VARCHAR(30), ce.[EndDateTime], 120))
 					END,
 		@EmailBody = CASE
-						WHEN [EndDateTime] IS NULL THEN REPLACE(@EmailBody,'##Duration###','N/A')
-						ELSE REPLACE(@EmailBody,'##Duration###',CAST(DATEDIFF(MINUTE, [StartDateTime], [EndDateTime]) AS VARCHAR(30)))
+						WHEN ce.[EndDateTime] IS NULL THEN REPLACE(@EmailBody,'##Duration###','N/A')
+						ELSE REPLACE(@EmailBody,'##Duration###',CAST(DATEDIFF(MINUTE, ce.[StartDateTime], ce.[EndDateTime]) AS VARCHAR(30)))
 					END,
-		@EmailBody = REPLACE(@EmailBody,'##CalledByADF###',[CallingDataFactoryName]),
-		@EmailBody = REPLACE(@EmailBody,'##ExecutedByADF###',[DataFactoryName]),
+		@EmailBody = REPLACE(@EmailBody,'##CalledByADF###',ce.[CallingDataFactoryName]),
+		@EmailBody = REPLACE(@EmailBody,'##ExecutedByADF###',ce.[DataFactoryName]),
 
 		--importance
 		@EmailImportance = 
-			CASE [PipelineStatus] 
+			CASE ce.[PipelineStatus] 
 				WHEN 'Success' THEN 'Low'
 				WHEN 'Failed' THEN 'High'
 				ELSE 'Normal'
 			END
 	FROM
-		[procfwk].[CurrentExecution]
+		[procfwk].[CurrentExecution] ce
+  INNER JOIN [procfwk].[Batches] b
+    ON b.[BatchId] = ce.[BatchId]
 	WHERE
-		[PipelineId] = @PipelineId
+		ce.[PipelineId] = @PipelineId
+    AND ce.[BatchId] = @BatchId
 	ORDER BY
 		[StartDateTime] DESC;
 	

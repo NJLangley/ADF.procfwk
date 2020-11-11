@@ -1,6 +1,7 @@
-CREATE PROCEDURE [procfwk].[CheckMetadataIntegrity]
+﻿CREATE   PROCEDURE [procfwk].[CheckMetadataIntegrity]
 	(
-	@DebugMode BIT = 0
+  @BatchId INT
+ ,@DebugMode BIT = 0
 	)
 AS
 BEGIN
@@ -25,6 +26,7 @@ BEGIN
 	Check 16 - When using DependencyChain failure handling, are there any dependants in the same execution stage of the predecessor?
 	Check 17 - Does the SPNHandlingMethod property have a valid value?
 	Check 18 - Does the Service Principal table contain both types of SPN handling for a single credential?
+  Check 19 - Is [procfwk].[BatchPipelineLink] populated for the supplied batch id?
 	---------------------------------------------------------------------------------------------------------------------------------
 	Check A: - Are there any Running pipelines that need to be cleaned up?
 	*/
@@ -352,6 +354,37 @@ BEGIN
 				)	
 		END;
 
+
+  --Check 19:
+	IF NOT EXISTS
+		(
+		SELECT
+		  *
+	  FROM
+      [procfwk].[BatchPipelineLink] bp
+      INNER JOIN [procfwk].[Pipelines] p
+        ON p.[PipelineId] = bp.[PipelineId]
+		  INNER JOIN [procfwk].[Stages] s
+			  ON p.[StageId] = s.[StageId]
+	  WHERE
+      bp.BatchId = @BatchId
+      AND bp.[Enabled] = 1
+		  AND p.[Enabled] = 1
+		  AND s.[Enabled] = 1
+		)
+		BEGIN
+			INSERT INTO @MetadataIntegrityIssues
+			VALUES
+				( 
+				18,
+				'The table [procfwk].[BatchPipelineLink] does not have data for BatchId=' + Cast(@BatchId AS VARCHAR(10)) + '. Data Factory has nothing to run.'
+				)	
+		END;
+
+
+    
+
+
 	/*
 	Integrity Checks Outcome:
 	*/
@@ -410,6 +443,7 @@ BEGIN
 			WHERE 
 				[PipelineStatus] NOT IN ('Success','Failed','Blocked','Cancelled') 
 				AND [AdfPipelineRunId] IS NOT NULL
+        AND BatchId = @BatchId
 		END;
 	ELSE
 		BEGIN

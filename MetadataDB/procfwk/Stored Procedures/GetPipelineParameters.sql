@@ -1,6 +1,7 @@
-﻿CREATE PROCEDURE [procfwk].[GetPipelineParameters]
+﻿CREATE   PROCEDURE [procfwk].[GetPipelineParameters]
 	(
-	@PipelineId INT
+	@PipelineId INT,
+  @BatchName NVARCHAR(200)
 	)
 AS
 BEGIN
@@ -51,6 +52,8 @@ BEGIN
 				[PipelineId] = @PipelineId;
 			END;
 		END;
+
+  SET @Json = Replace(@Json, '{{BatchName}}', @BatchName)
 
 	--return JSON snippet
 	SELECT @Json AS Params

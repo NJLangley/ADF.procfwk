@@ -1,6 +1,7 @@
-﻿CREATE PROCEDURE [procfwk].[SetLogPipelineUnknown]
+﻿CREATE   PROCEDURE [procfwk].[SetLogPipelineUnknown]
 	(
 	@ExecutionId UNIQUEIDENTIFIER,
+  @BatchId INT,
 	@StageId INT,
 	@PipelineId INT,
 	@CleanUpRun BIT = 0
@@ -18,6 +19,7 @@ BEGIN
 		[PipelineStatus] = 'Unknown'
 	WHERE
 		[LocalExecutionId] = @ExecutionId
+    AND [BatchId] = @BatchId
 		AND [StageId] = @StageId
 		AND [PipelineId] = @PipelineId
 
@@ -28,6 +30,7 @@ BEGIN
 	INSERT INTO [procfwk].[ExecutionLog]
 		(
 		[LocalExecutionId],
+    [BatchId],
 		[StageId],
 		[PipelineId],
 		[CallingDataFactoryName],
@@ -42,6 +45,7 @@ BEGIN
 		)
 	SELECT
 		[LocalExecutionId],
+    [BatchId],
 		[StageId],
 		[PipelineId],
 		[CallingDataFactoryName],
@@ -57,6 +61,8 @@ BEGIN
 		[procfwk].[CurrentExecution]
 	WHERE
 		[PipelineStatus] = 'Unknown'
+    AND [LocalExecutionId] = @ExecutionId
+    AND [BatchId] = @BatchId
 		AND [StageId] = @StageId
 		AND [PipelineId] = @PipelineId;
 
@@ -80,6 +86,7 @@ BEGIN
 					[IsBlocked] = 1
 				WHERE
 					[LocalExecutionId] = @ExecutionId
+          AND [BatchId] = @BatchId
 					AND [StageId] > @StageId
 
 				SET @ErrorDetail = 'Pipeline execution has an unknown status. Blocking downstream stages as a precaution.'
@@ -91,6 +98,7 @@ BEGIN
 			BEGIN
 				EXEC [procfwk].[SetExecutionBlockDependants]
 					@ExecutionId = @ExecutionId,
+          @BatchId = @BatchId,
 					@PipelineId = @PipelineId
 			END;
 		ELSE

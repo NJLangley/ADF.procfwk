@@ -1,6 +1,7 @@
-﻿CREATE PROCEDURE [procfwk].[SetLogPipelineFailed]
+﻿CREATE   PROCEDURE [procfwk].[SetLogPipelineFailed]
 	(
 	@ExecutionId UNIQUEIDENTIFIER,
+  @BatchId INT,
 	@StageId INT,
 	@PipelineId INT,
 	@RunId UNIQUEIDENTIFIER = NULL
@@ -18,6 +19,7 @@ BEGIN
 		[PipelineStatus] = 'Failed'
 	WHERE
 		[LocalExecutionId] = @ExecutionId
+    AND [BatchId] = @BatchId
 		AND [StageId] = @StageId
 		AND [PipelineId] = @PipelineId
 
@@ -54,6 +56,8 @@ BEGIN
 		[procfwk].[CurrentExecution]
 	WHERE
 		[PipelineStatus] = 'Failed'
+		AND [LocalExecutionId] = @ExecutionId
+    AND [BatchId] = @BatchId
 		AND [StageId] = @StageId
 		AND [PipelineId] = @PipelineId;
 	
@@ -73,6 +77,7 @@ BEGIN
 				[IsBlocked] = 1
 			WHERE
 				[LocalExecutionId] = @ExecutionId
+        AND [BatchId] = @BatchId
 				AND [StageId] > @StageId
 			
 			--raise error to stop processing
@@ -94,6 +99,7 @@ BEGIN
 		BEGIN
 			EXEC [procfwk].[SetExecutionBlockDependants]
 				@ExecutionId = @ExecutionId,
+        @BatchId = @BatchId,
 				@PipelineId = @PipelineId
 		END;
 	ELSE

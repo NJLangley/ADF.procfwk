@@ -21,7 +21,10 @@
 			"WaitTime": {
 				"type": "int",
 				"defaultValue": 5
-			}
+			},
+            "BatchName": {
+                "type": "string"
+            }
 		},
 		"folder": {
 			"name": "_Workers"

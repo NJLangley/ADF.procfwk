@@ -1,6 +1,7 @@
-﻿CREATE PROCEDURE [procfwk].[GetWorkerAuthDetails]
+﻿CREATE   PROCEDURE [procfwk].[GetWorkerAuthDetails]
 	(
 	@ExecutionId UNIQUEIDENTIFIER,
+  @BatchId INT,
 	@StageId INT,
 	@PipelineId INT
 	)
@@ -23,6 +24,7 @@ BEGIN
 		[procfwk].[CurrentExecution]
 	WHERE 
 		[LocalExecutionId] = @ExecutionId
+    AND [BatchId] = @BatchId
 		AND [StageId] = @StageId
 		AND [PipelineId] = @PipelineId;
 		

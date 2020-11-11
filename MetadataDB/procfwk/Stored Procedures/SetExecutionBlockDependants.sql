@@ -1,12 +1,13 @@
-﻿CREATE PROCEDURE [procfwk].[SetExecutionBlockDependants]
+﻿CREATE   PROCEDURE [procfwk].[SetExecutionBlockDependants]
 	(
 	@ExecutionId UNIQUEIDENTIFIER = NULL,
+  @BatchId INT,
 	@PipelineId INT
 	)
 AS
 BEGIN
 	--assume current execution if value not provided
-	IF @ExecutionId IS NULL SELECT TOP 1 @ExecutionId = [LocalExecutionId] FROM [procfwk].[CurrentExecution];
+	IF @ExecutionId IS NULL SELECT TOP 1 @ExecutionId = [LocalExecutionId] FROM [procfwk].[CurrentExecution] WHERE [BatchId] = @BatchId;
 	
 	--update dependents status
 	UPDATE
@@ -20,5 +21,6 @@ BEGIN
 			ON pe.[DependantPipelineId] = ce.[PipelineId]
 	WHERE
 		ce.[LocalExecutionId] = @ExecutionId
+    AND ce.[BatchId] = @BatchId
 		AND pe.[PipelineId] = @PipelineId
 END;

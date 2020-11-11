@@ -1,6 +1,8 @@
-﻿CREATE PROCEDURE [procfwk].[CreateNewExecution]
+﻿CREATE   PROCEDURE [procfwk].[CreateNewExecution]
 	(
-	@CallingDataFactoryName NVARCHAR(200)
+	@CallingDataFactoryName NVARCHAR(200),
+  @AdfParentPipelineRunId UNIQUEIDENTIFIER,
+  @BatchId INT
 	)
 AS
 BEGIN
@@ -8,34 +10,43 @@ BEGIN
 
 	DECLARE @LocalExecutionId UNIQUEIDENTIFIER = NEWID()
 
-	TRUNCATE TABLE [procfwk].[CurrentExecution];
+	DELETE FROM [procfwk].[CurrentExecution]
+  WHERE [BatchId] = @BatchId;
 
 	INSERT INTO [procfwk].[CurrentExecution]
 		(
 		[LocalExecutionId],
+    [BatchId],
 		[StageId],
 		[PipelineId],
 		[CallingDataFactoryName],
 		[ResourceGroupName],
 		[DataFactoryName],
-		[PipelineName]
+		[PipelineName],
+    [AdfParentPipelineRunId]
 		)
 	SELECT
 		@LocalExecutionId,
+    @BatchId,
 		p.[StageId],
 		p.[PipelineId],
 		@CallingDataFactoryName,
 		d.[ResourceGroupName],
 		d.[DataFactoryName],
-		p.[PipelineName]
+		p.[PipelineName],
+    @AdfParentPipelineRunId
 	FROM
-		[procfwk].[Pipelines] p
+    [procfwk].[BatchPipelineLink] bp
+    INNER JOIN [procfwk].[Pipelines] p
+      ON p.[PipelineId] = bp.[PipelineId]
 		INNER JOIN [procfwk].[Stages] s
 			ON p.[StageId] = s.[StageId]
 		INNER JOIN [procfwk].[DataFactorys] d
 			ON p.[DataFactoryId] = d.[DataFactoryId]
 	WHERE
-		p.[Enabled] = 1
+    bp.BatchId = @BatchId
+    AND bp.[Enabled] = 1
+		AND p.[Enabled] = 1
 		AND s.[Enabled] = 1
 
 	ALTER INDEX [IDX_GetPipelinesInStage] ON [procfwk].[CurrentExecution]

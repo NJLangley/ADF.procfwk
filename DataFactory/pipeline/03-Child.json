@@ -7,7 +7,14 @@
 				"name": "Get Pipelines",
 				"description": "Returns all pipelines from the metadata to be executed within a given processing stage.",
 				"type": "Lookup",
-				"dependsOn": [],
+				"dependsOn": [
+                    {
+                        "activity": "Set Child Pipeline Run Id",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
 				"policy": {
 					"timeout": "0.00:10:00",
 					"retry": 0,
@@ -28,6 +35,13 @@
 									"type": "Expression"
 								}
 							},
+							"BatchId": {
+                                "type": "Int32",
+                                "value": {
+                                    "value": "@pipeline().parameters.BatchId",
+                                    "type": "Expression"
+                                }
+                            },
 							"StageId": {
 								"type": "Int32",
 								"value": {
@@ -91,13 +105,71 @@
 									"pipelineId": {
 										"value": "@item().PipelineId",
 										"type": "Expression"
-									}
+									},
+                                    "BatchId": {
+                                        "value": "@pipeline().parameters.BatchId",
+                                        "type": "Expression"
+                                    },
+                                    "BatchName": {
+                                        "value": "@pipeline().parameters.BatchName",
+                                        "type": "Expression"
+                                    }
 								}
 							}
 						}
 					]
 				}
-			}
+			},
+            {
+                "name": "Set Child Pipeline Run Id",
+                "type": "SqlServerStoredProcedure",
+                "dependsOn": [],
+                "policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 0,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "storedProcedureName": "[procfwk].[SetLogChildPipelineRunId]",
+                    "storedProcedureParameters": {
+                        "AdfChildPipelineRunId": {
+                            "value": {
+                                "value": "@pipeline().RunId",
+                                "type": "Expression"
+                            },
+                            "type": "Guid"
+                        },
+                        "BatchId": {
+                            "value": {
+                                "value": "@pipeline().parameters.BatchId",
+                                "type": "Expression"
+                            },
+                            "type": "Int32"
+                        },
+                        "ExecutionId": {
+                            "value": {
+                                "value": "@pipeline().parameters.ExecutionId",
+                                "type": "Expression"
+                            },
+                            "type": "Guid"
+                        },
+                        "StageId": {
+                            "value": {
+                                "value": "@pipeline().parameters.StageId",
+                                "type": "Expression"
+                            },
+                            "type": "Int32"
+                        }
+                    }
+                },
+                "linkedServiceName": {
+                    "referenceName": "SupportDatabase",
+                    "type": "LinkedServiceReference"
+                }
+            }
 		],
 		"parameters": {
 			"StageId": {
@@ -105,7 +177,13 @@
 			},
 			"ExecutionId": {
 				"type": "string"
-			}
+			},
+            "BatchId": {
+                "type": "int"
+            },
+            "BatchName": {
+                "type": "string"
+            }
 		},
 		"folder": {
 			"name": "_ProcFwk"

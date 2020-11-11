@@ -1,6 +1,7 @@
-﻿CREATE PROCEDURE procfwk.SetLogPipelineRunning
+﻿CREATE   PROCEDURE procfwk.SetLogPipelineRunning
 	(
 	@ExecutionId UNIQUEIDENTIFIER,
+  @BatchId INT,
 	@StageId INT,
 	@PipelineId INT
 	)
@@ -16,6 +17,7 @@ BEGIN
 		[PipelineStatus] = 'Running'
 	WHERE
 		[LocalExecutionId] = @ExecutionId
+    AND [BatchId] = @BatchId
 		AND [StageId] = @StageId
 		AND [PipelineId] = @PipelineId
 END;

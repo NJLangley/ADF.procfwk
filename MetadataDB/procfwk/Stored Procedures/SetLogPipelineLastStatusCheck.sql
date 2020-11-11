@@ -1,6 +1,7 @@
-﻿CREATE PROCEDURE [procfwk].[SetLogPipelineLastStatusCheck]
+﻿CREATE   PROCEDURE [procfwk].[SetLogPipelineLastStatusCheck]
 	(
 	@ExecutionId UNIQUEIDENTIFIER,
+  @BatchId INT,
 	@StageId INT,
 	@PipelineId INT
 	)
@@ -14,6 +15,7 @@ BEGIN
 		[LastStatusCheckDateTime] = GETUTCDATE()
 	WHERE
 		[LocalExecutionId] = @ExecutionId
+    AND [BatchId] = @BatchId
 		AND [StageId] = @StageId
 		AND [PipelineId] = @PipelineId
 END;

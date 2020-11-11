@@ -1,6 +1,7 @@
-﻿CREATE PROCEDURE [procfwk].[GetWorkerPipelineDetails]
+﻿CREATE   PROCEDURE [procfwk].[GetWorkerPipelineDetails]
 	(
 	@ExecutionId UNIQUEIDENTIFIER,
+  @BatchId INT,
 	@StageId INT,
 	@PipelineId INT
 	)
@@ -11,11 +12,14 @@ BEGIN
 	SELECT 
 		[PipelineName],
 		[DataFactoryName],
-		[ResourceGroupName]
+		[ResourceGroupName],
+    [AdfPipelineRunId],
+    [AdFInfantPipelineRunId]
 	FROM 
 		[procfwk].[CurrentExecution]
 	WHERE 
 		[LocalExecutionId] = @ExecutionId
+    AND BatchId = @BatchId
 		AND [StageId] = @StageId
 		AND [PipelineId] = @PipelineId;
 END;

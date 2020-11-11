@@ -107,8 +107,15 @@
 								"value": {
 									"value": "@pipeline().parameters.pipelineId",
 									"type": "Expression"
+									}
+								},
+								"BatchName": {
+									"type": "String",
+									"value": {
+										"value": "@pipeline().parameters.BatchName",
+										"type": "Expression"
+									}
 								}
-							}
 						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
@@ -155,7 +162,14 @@
 								"type": "Expression"
 							},
 							"type": "Int32"
-						}
+						},
+                        "BatchId": {
+                            "value": {
+                                "value": "@pipeline().parameters.BatchId",
+                                "type": "Expression"
+                            },
+                            "type": "Int32"
+                        }
 					}
 				},
 				"linkedServiceName": {
@@ -167,7 +181,14 @@
 				"name": "Get Worker Authentication Details",
 				"description": "Return the SPN ID and Secret for the worker pipeline being executed. Called at this level as each pipeline can have a different SPN.",
 				"type": "Lookup",
-				"dependsOn": [],
+                "dependsOn": [
+                    {
+                        "activity": "Set Infant Pipeline Run Id",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
 				"policy": {
 					"timeout": "0.00:10:00",
 					"retry": 0,
@@ -201,7 +222,14 @@
 									"value": "@pipeline().parameters.stageId",
 									"type": "Expression"
 								}
-							}
+							},
+                            "BatchId": {
+                                "type": "Int32",
+                                "value": {
+                                    "value": "@pipeline().parameters.BatchId",
+                                    "type": "Expression"
+                                }
+                            }
 						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
@@ -259,7 +287,14 @@
 						"CallingActivity": {
 							"value": "ExecuteWorkerPipeline",
 							"type": "String"
-						}
+						},
+                        "BatchId": {
+                            "value": {
+                                "value": "@pipeline().parameters.BatchId",
+                                "type": "Expression"
+                            },
+                            "type": "Int32"
+                        }
 					}
 				},
 				"linkedServiceName": {
@@ -317,7 +352,14 @@
 								"type": "Expression"
 							},
 							"type": "Int32"
-						}
+						},
+                        "BatchId": {
+                            "value": {
+                                "value": "@pipeline().parameters.BatchId",
+                                "type": "Expression"
+                            },
+                            "type": "Int32"
+                        }
 					}
 				},
 				"linkedServiceName": {
@@ -362,7 +404,14 @@
 									"value": "@pipeline().parameters.pipelineId",
 									"type": "Expression"
 								}
-							}
+							},
+                            "BatchId": {
+                                "type": "Int32",
+                                "value": {
+                                    "value": "@pipeline().parameters.BatchId",
+                                    "type": "Expression"
+                                }
+                            }
 						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
@@ -416,7 +465,14 @@
 												"value": "@pipeline().parameters.pipelineId",
 												"type": "Expression"
 											}
-										}
+										},
+                                        "BatchId": {
+                                            "type": "Int32",
+                                            "value": {
+                                                "value": "@pipeline().parameters.BatchId",
+                                                "type": "Expression"
+                                            }
+                                        }
 									},
 									"queryTimeout": "02:00:00",
 									"partitionOption": "None"
@@ -598,7 +654,14 @@
 											"type": "Expression"
 										},
 										"type": "Int32"
-									}
+									},
+                                    "BatchId": {
+                                        "value": {
+                                            "value": "@pipeline().parameters.BatchId",
+                                            "type": "Expression"
+                                        },
+                                        "type": "Int32"
+                                    }
 								}
 							},
 							"linkedServiceName": {
@@ -653,7 +716,14 @@
 											"type": "Expression"
 										},
 										"type": "Int32"
-									}
+									},
+                                    "BatchId": {
+                                        "value": {
+                                            "value": "@pipeline().parameters.BatchId",
+                                            "type": "Expression"
+                                        },
+                                        "type": "Int32"
+                                    }
 								}
 							},
 							"linkedServiceName": {
@@ -744,7 +814,14 @@
 													"type": "Expression"
 												},
 												"type": "Int32"
-											}
+											},
+                                            "BatchId": {
+                                                "value": {
+                                                    "value": "@pipeline().parameters.BatchId",
+                                                    "type": "Expression"
+                                                },
+                                                "type": "Int32"
+                                            }
 										}
 									},
 									"linkedServiceName": {
@@ -800,7 +877,14 @@
 													"type": "Expression"
 												},
 												"type": "Int32"
-											}
+											},
+                                            "BatchId": {
+                                                "value": {
+                                                    "value": "@pipeline().parameters.BatchId",
+                                                    "type": "Expression"
+                                                },
+                                                "type": "Int32"
+                                            }
 										}
 									},
 									"linkedServiceName": {
@@ -967,7 +1051,14 @@
 											"type": "Expression"
 										},
 										"type": "Int32"
-									}
+									},
+                                    "BatchId": {
+                                        "value": {
+                                            "value": "@pipeline().parameters.BatchId",
+                                            "type": "Expression"
+                                        },
+                                        "type": "Int32"
+                                    }
 								}
 							},
 							"linkedServiceName": {
@@ -1111,7 +1202,14 @@
 									"value": "@pipeline().parameters.stageId",
 									"type": "Expression"
 								}
-							}
+							},
+                            "BatchId": {
+                                "type": "Int32",
+                                "value": {
+                                    "value": "@pipeline().parameters.BatchId",
+                                    "type": "Expression"
+                                }
+                            }
 						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
@@ -1226,6 +1324,63 @@
 						"type": "Expression"
 					}
 				}
+			},
+            {
+                "name": "Set Infant Pipeline Run Id",
+                "type": "SqlServerStoredProcedure",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.00:10:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": true
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "storedProcedureName": "[procfwk].[SetLogInfantPipelineRunId]",
+                    "storedProcedureParameters": {
+                        "AdfInfantPipelineRunId": {
+                            "value": {
+                                "value": "@pipeline().RunId",
+                                "type": "Expression"
+                            },
+                            "type": "Guid"
+                        },
+                        "BatchId": {
+                            "value": {
+                                "value": "@pipeline().parameters.BatchId",
+                                "type": "Expression"
+                            },
+                            "type": "Int32"
+                        },
+                        "ExecutionId": {
+                            "value": {
+                                "value": "@pipeline().parameters.executionId",
+                                "type": "Expression"
+                            },
+                            "type": "Guid"
+                        },
+                        "PipelineId": {
+                            "value": {
+                                "value": "@pipeline().parameters.pipelineId",
+                                "type": "Expression"
+                            },
+                            "type": "Int32"
+                        },
+                        "StageId": {
+                            "value": {
+                                "value": "@pipeline().parameters.stageId",
+                                "type": "Expression"
+                            },
+                            "type": "Int32"
+                        }
+                    }
+                },
+                "linkedServiceName": {
+                    "referenceName": "SupportDatabase",
+                    "type": "LinkedServiceReference"
+				}
 			}
 		],
 		"parameters": {
@@ -1237,7 +1392,13 @@
 			},
 			"pipelineId": {
 				"type": "int"
-			}
+			},
+            "BatchId": {
+                "type": "int"
+            },
+            "BatchName": {
+                "type": "string"
+            }
 		},
 		"variables": {
 			"WorkerPipelineState": {

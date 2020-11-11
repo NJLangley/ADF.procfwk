@@ -1,4 +1,8 @@
-﻿CREATE PROCEDURE [procfwk].[ResetExecution]
+﻿CREATE   PROCEDURE [procfwk].[ResetExecution]
+	(
+  @BatchId INT,
+  @AdfParentPipelineRunId UNIQUEIDENTIFIER
+	)
 AS
 BEGIN 
 	SET NOCOUNT	ON;
@@ -7,6 +11,7 @@ BEGIN
 	INSERT INTO [procfwk].[ExecutionLog]
 		(
 		[LocalExecutionId],
+    [BatchId],
 		[StageId],
 		[PipelineId],
 		[CallingDataFactoryName],
@@ -19,6 +24,7 @@ BEGIN
 		)
 	SELECT
 		[LocalExecutionId],
+    [BatchId],
 		[StageId],
 		[PipelineId],
 		[CallingDataFactoryName],
@@ -31,14 +37,15 @@ BEGIN
 	FROM
 		[procfwk].[CurrentExecution]
 	WHERE
+    [BatchId] = @BatchId
 		--these are predicted states
-		[PipelineStatus] NOT IN
-			(
-			'Success',
-			'Failed',
-			'Blocked',
-			'Cancelled'
-			);
+		AND [PipelineStatus] NOT IN
+			    (
+			    'Success',
+			    'Failed',
+			    'Blocked',
+			    'Cancelled'
+			    );
 		
 	--reset status ready for next attempt
 	UPDATE
@@ -50,14 +57,20 @@ BEGIN
 		[LastStatusCheckDateTime] = NULL,
 		[AdfPipelineRunId] = NULL,
 		[PipelineParamsUsed] = NULL,
-		[IsBlocked] = 0
+		[IsBlocked] = 0,
+    [AdfParentPipelineRunId] = @AdfParentPipelineRunId
 	WHERE
-		ISNULL([PipelineStatus],'') <> 'Success'
-		OR [IsBlocked] = 1;
+    [BatchId] = @BatchId
+		AND 
+    (
+      IsNull([PipelineStatus],'') <> 'Success'
+		  OR [IsBlocked] = 1
+    );
 	
 	--return current execution id
 	SELECT DISTINCT
 		[LocalExecutionId] AS ExecutionId
 	FROM
-		[procfwk].[CurrentExecution];
+		[procfwk].[CurrentExecution]
+  WHERE [BatchId] = @BatchId;
 END;

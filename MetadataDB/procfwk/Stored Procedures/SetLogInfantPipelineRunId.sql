@@ -1,21 +1,22 @@
-﻿CREATE   PROCEDURE [procfwk].[SetLogPipelineChecking]
+﻿CREATE   PROCEDURE [procfwk].[SetLogInfantPipelineRunId]
 	(
 	@ExecutionId UNIQUEIDENTIFIER,
   @BatchId INT,
 	@StageId INT,
-	@PipelineId INT
+  @PipelineId INT,
+  @AdfInfantPipelineRunId UNIQUEIDENTIFIER
 	)
 AS
 BEGIN
 	SET NOCOUNT ON;
-
+	
 	UPDATE
 		[procfwk].[CurrentExecution]
 	SET
-		[PipelineStatus] = 'Checking'
+		[AdfInfantPipelineRunId] = @AdfInfantPipelineRunId
 	WHERE
 		[LocalExecutionId] = @ExecutionId
     AND [BatchId] = @BatchId
 		AND [StageId] = @StageId
-		AND [PipelineId] = @PipelineId
-END;
+    AND [PipelineId] = @PipelineId;
+END

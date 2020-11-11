@@ -1,6 +1,7 @@
-﻿CREATE PROCEDURE [procfwk].[UpdateExecutionLog]
+﻿CREATE   PROCEDURE [procfwk].[UpdateExecutionLog]
 	(
-	@PerformErrorCheck BIT = 1
+	@PerformErrorCheck BIT = 1,
+  @BatchId INT
 	)
 AS
 BEGIN
@@ -12,8 +13,8 @@ BEGIN
 	IF @PerformErrorCheck = 1
 	BEGIN
 		--Check current execution
-		SELECT @AllCount = COUNT(0) FROM [procfwk].[CurrentExecution]
-		SELECT @SuccessCount = COUNT(0) FROM [procfwk].[CurrentExecution] WHERE [PipelineStatus] = 'Success'
+		SELECT @AllCount = COUNT(0) FROM [procfwk].[CurrentExecution] WHERE [BatchId] = @BatchId
+		SELECT @SuccessCount = COUNT(0) FROM [procfwk].[CurrentExecution] WHERE [BatchId] = @BatchId AND [PipelineStatus] = 'Success'
 
 		IF @AllCount <> @SuccessCount
 			BEGIN
@@ -26,6 +27,7 @@ BEGIN
 	INSERT INTO [procfwk].[ExecutionLog]
 		(
 		[LocalExecutionId],
+    [BatchId],
 		[StageId],
 		[PipelineId],
 		[CallingDataFactoryName],
@@ -40,6 +42,7 @@ BEGIN
 		)
 	SELECT
 		[LocalExecutionId],
+    [BatchId],
 		[StageId],
 		[PipelineId],
 		[CallingDataFactoryName],
@@ -52,7 +55,10 @@ BEGIN
 		[AdfPipelineRunId],
 		[PipelineParamsUsed]
 	FROM
-		[procfwk].[CurrentExecution];
+		[procfwk].[CurrentExecution]
+  WHERE
+    [BatchId] = @BatchId;
 
-	TRUNCATE TABLE [procfwk].[CurrentExecution];
+	DELETE FROM [procfwk].[CurrentExecution]
+  WHERE BatchId = @BatchId;
 END;
