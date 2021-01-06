@@ -43,7 +43,8 @@ BEGIN
 				[CallingDataFactoryName],
 				[ResourceGroupName],
 				[DataFactoryName],
-				[PipelineName]
+				[PipelineName],
+				[StageRunOrder]
 				)
 			SELECT
 				@LocalExecutionId,
@@ -52,7 +53,8 @@ BEGIN
 				@CallingDataFactoryName,
 				d.[ResourceGroupName],
 				d.[DataFactoryName],
-				p.[PipelineName]
+				p.[PipelineName],
+				p.[StageId]
 			FROM
 				[procfwk].[Pipelines] p
 				INNER JOIN [procfwk].[Stages] s
@@ -111,7 +113,8 @@ BEGIN
 				[CallingDataFactoryName],
 				[ResourceGroupName],
 				[DataFactoryName],
-				[PipelineName]
+				[PipelineName],
+				[StageRunOrder]
 				)
 			SELECT
 				@LocalExecutionId,
@@ -120,7 +123,8 @@ BEGIN
 				@CallingDataFactoryName,
 				d.[ResourceGroupName],
 				d.[DataFactoryName],
-				p.[PipelineName]
+				p.[PipelineName],
+				b.[RunOrder]
 			FROM
 				[procfwk].[Pipelines] p
 				INNER JOIN [procfwk].[Stages] s

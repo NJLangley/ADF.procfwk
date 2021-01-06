@@ -39,7 +39,8 @@ BEGIN
 				[PipelineStatus],
 				[EndDateTime],
 				[AdfPipelineRunId],
-				[PipelineParamsUsed]
+				[PipelineParamsUsed],
+				[StageRunOrder]
 				)
 			SELECT
 				[LocalExecutionId],
@@ -53,7 +54,8 @@ BEGIN
 				[PipelineStatus],
 				[EndDateTime],
 				[AdfPipelineRunId],
-				[PipelineParamsUsed]
+				[PipelineParamsUsed],
+				[StageRunOrder]
 			FROM
 				[procfwk].[CurrentExecution];
 
@@ -118,7 +120,8 @@ BEGIN
 				[PipelineStatus],
 				[EndDateTime],
 				[AdfPipelineRunId],
-				[PipelineParamsUsed]
+				[PipelineParamsUsed],
+				[StageRunOrder]
 				)
 			SELECT
 				[LocalExecutionId],
@@ -132,7 +135,8 @@ BEGIN
 				[PipelineStatus],
 				[EndDateTime],
 				[AdfPipelineRunId],
-				[PipelineParamsUsed]
+				[PipelineParamsUsed],
+				[StageRunOrder]
 			FROM
 				[procfwk].[CurrentExecution]
 			WHERE 
