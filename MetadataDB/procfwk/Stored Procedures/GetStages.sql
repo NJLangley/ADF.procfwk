@@ -22,13 +22,15 @@ BEGIN
 			RETURN 0;
 		END;
 
-	SELECT DISTINCT 
+	SELECT
 		[StageId] 
 	FROM 
 		[procfwk].[CurrentExecution]
 	WHERE
 		[LocalExecutionId] = @ExecutionId
 		AND ISNULL([PipelineStatus],'') <> 'Success'
-	ORDER BY 
-		[StageId] ASC
+	GROUP BY
+		[StageId]
+	ORDER BY
+		Min([StageRunOrder]) ASC
 END;

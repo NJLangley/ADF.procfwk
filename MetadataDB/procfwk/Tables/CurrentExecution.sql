@@ -13,9 +13,12 @@
     [EndDateTime]      DATETIME         NULL,
     [IsBlocked] BIT NOT NULL DEFAULT 0,
     [PipelineRunId] UNIQUEIDENTIFIER NULL,
-    [PipelineParamsUsed] NVARCHAR(MAX) NULL, 
+    [PipelineParamsUsed] NVARCHAR(MAX) NULL,
+    [StageRunOrder] INT NOT NULL,
     CONSTRAINT [PK_CurrentExecution] PRIMARY KEY CLUSTERED ([LocalExecutionId] ASC, [StageId] ASC, [PipelineId] ASC)
 );
+
+
 GO
 
 CREATE NONCLUSTERED INDEX [IDX_GetPipelinesInStage] ON [procfwk].[CurrentExecution]
