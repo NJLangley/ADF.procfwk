@@ -31,11 +31,16 @@ Import-Module -Name "azure.datafactory.tools"
 
 Get-Module -Name "*DataFactory*"
 
+$VerbosePreference = 'Continue'
+
 # Login as a Service Principal
 if ($spId) {
     $passwd = ConvertTo-SecureString $spKey -AsPlainText -Force
     $pscredential = New-Object System.Management.Automation.PSCredential($spId, $passwd)
     Connect-AzAccount -ServicePrincipal -Credential $pscredential -TenantId $tenantId | Out-Null
+}
+else {
+    Connect-AzAccount -TenantId $tenantId -Subscription $subscriptionId | Out-Null
 }
 Get-AzContext
 
@@ -67,14 +72,31 @@ Publish-AdfV2FromJson -RootFolder $adfPath `
 
 
 # Run function
-$VerbosePreference = 'Continue'
+#$VerbosePreference = 'Continue'
 $ErrorActionPreference = 'Stop'
 
 $scriptPath = Join-Path -Path (Get-Location) -ChildPath "\DeploymentTools\DataFactory"
 $AdfPath = Join-Path -Path (Get-Location) -ChildPath "DataFactory"
 
-Publish-procfwkadf  -resourceGroupName 'rg-pademo' -dataFactoryName 'adf-metadata-driven-proc' -region 'uksouth' `
-    -adfPath "$AdfPath" -scriptPath "$scriptPath"
+$resourceGroupName = [System.Environment]::GetEnvironmentVariable('AZURE_RESOURCE_GROUP_NAME')
+$dataFactoryName = [System.Environment]::GetEnvironmentVariable('AZURE_DATA_FACTORY_NAME')
+$region = [System.Environment]::GetEnvironmentVariable('AZURE_REGION')
 
+
+if (!$resourceGroupName) {
+    Write-Host 'Setting default variable: $resourceGroupName'
+    $resourceGroupName = 'rg-pademo'
+}
+if (!$dataFactoryName) {
+    Write-Host 'Setting default variable: $dataFactoryName'
+    $dataFactoryName = 'adf-metadata-driven-proc'
+}
+if (!$region) {
+    Write-Host 'Setting default variable: $region'
+    $region = 'uksouth'
+}
+
+Publish-procfwkadf -resourceGroupName "$resourceGroupName" -dataFactoryName "$dataFactoryName" -region "$region" `
+    -adfPath "$AdfPath" -scriptPath "$scriptPath"
 
 
