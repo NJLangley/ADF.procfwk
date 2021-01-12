@@ -91,7 +91,11 @@
 									"pipelineId": {
 										"value": "@item().PipelineId",
 										"type": "Expression"
-									}
+									},
+                                    "pipelineLogicalUsageValue": {
+                                        "value": "@item().PipelineLogicalUsageValue",
+                                        "type": "Expression"
+                                    }
 								}
 							}
 						}
