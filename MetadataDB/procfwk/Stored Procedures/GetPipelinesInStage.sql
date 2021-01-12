@@ -8,7 +8,8 @@ BEGIN
 	SET NOCOUNT ON;
 
 	SELECT 
-		[PipelineId]
+		[PipelineId],
+		[PipelineLogicalUsageValue]
 	FROM 
 		[procfwk].[CurrentExecution]
 	WHERE 

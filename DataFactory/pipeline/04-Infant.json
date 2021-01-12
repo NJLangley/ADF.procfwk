@@ -1468,7 +1468,10 @@
 			},
 			"pipelineId": {
 				"type": "int"
-			}
+			},
+            "pipelineLogicalUsageValue": {
+                "type": "string"
+            }
 		},
 		"variables": {
 			"WorkerPipelineState": {
