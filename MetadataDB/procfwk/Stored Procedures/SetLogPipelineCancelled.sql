@@ -1,4 +1,5 @@
-﻿CREATE PROCEDURE [procfwk].[SetLogPipelineCancelled]
+﻿
+CREATE PROCEDURE [procfwk].[SetLogPipelineCancelled]
 	(
 	@ExecutionId UNIQUEIDENTIFIER,
 	@StageId INT,
@@ -29,7 +30,10 @@ BEGIN
 		(
 		[LocalExecutionId],
 		[StageId],
+		[StageName],
+		[StageRunOrder],
 		[PipelineId],
+		[PipelineLogicalUsageValue],
 		[CallingDataFactoryName],
 		[ResourceGroupName],
 		[DataFactoryName],
@@ -43,7 +47,10 @@ BEGIN
 	SELECT
 		[LocalExecutionId],
 		[StageId],
+		[StageName],
+		[StageRunOrder],
 		[PipelineId],
+		[PipelineLogicalUsageValue],
 		[CallingDataFactoryName],
 		[ResourceGroupName],
 		[DataFactoryName],

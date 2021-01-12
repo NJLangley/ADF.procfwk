@@ -81,6 +81,7 @@
     <Folder Include="procfwkReporting\Views" />
     <Folder Include="procfwkHelpers\Views" />
     <Folder Include="procfwkTesting\Stored Procedures" />
+    <Folder Include="dbo\Functions\" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="procfwk\Tables\Pipelines.sql" />
@@ -210,6 +211,23 @@
     <Build Include="procfwk\Stored Procedures\CheckPreviousExeuction.sql" />
     <Build Include="procfwk\Stored Procedures\SetLogPipelineValidating.sql" />
     <Build Include="procfwkTesting\Stored Procedures\Add300WorkerPipelineBatches.sql" />
+    <Build Include="dbo\Functions\PrettyPrintJson.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\ImportTenantsFromJson.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\ImportSubscriptionsFromJson.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\ImportStagesFromJson.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\ImportServicePrincipalsFromJson.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\ImportPropertiesFromJson.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\ImportPipelinesFromJson.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\ImportPipelineParametersFromJson.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\ImportpipelineDependenciesFromJson.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\ImportPipelineAlertingFromJson.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\ImportDataFactoriesFromJson.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\ImportConfigFromJson.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\ImportBatchStageLinkFromJson.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\ImportBatchesFromJson.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\ImportAlertRecipientsFromJson.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\ExportConfigAsJson.sql" />
+    <Build Include="procfwkReporting\Views\CurrentBatchExecutionSummary.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Script.PostDeployment.sql" />

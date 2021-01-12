@@ -20,8 +20,11 @@ WITH maxLog AS
 SELECT
 	el2.[LogId],
 	el2.[StageId],
+	el2.[StageName],
+	el2.[StageRunOrder],
 	el2.[PipelineId],
 	el2.[PipelineName],
+	el2.[PipelineLogicalUsageValue],
 	el2.[StartDateTime],
 	el2.[PipelineStatus],
 	el2.[EndDateTime],

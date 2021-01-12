@@ -1,4 +1,4 @@
-﻿CREATE VIEW [procfwkReporting].[AverageStageDuration]
+﻿CREATE   VIEW [procfwkReporting].[AverageStageDuration]
 AS
 
 WITH stageStartEnd AS
@@ -6,25 +6,27 @@ WITH stageStartEnd AS
 	SELECT
 		[LocalExecutionId],
 		[StageId],
+		[StageName],
 		MIN([StartDateTime]) AS 'StageStart',
 		MAX([EndDateTime]) AS 'StageEnd'
 	FROM
 		[procfwk].[ExecutionLog]
 	GROUP BY
 		[LocalExecutionId],
-		[StageId]
+		[StageId],
+    [StageName]
 	)
 
 SELECT
-	s.[StageId],
-	s.[StageName],
+	sse.[StageId],
+	sse.[StageName],
 	s.[StageDescription],
-	AVG(DATEDIFF(MINUTE, stageStartEnd.[StageStart], stageStartEnd.[StageEnd])) 'AvgStageRunDurationMinutes'
+	AVG(DATEDIFF(MINUTE, sse.[StageStart], sse.[StageEnd])) 'AvgStageRunDurationMinutes'
 FROM
-	stageStartEnd
-	INNER JOIN [procfwk].[Stages] s
-		ON stageStartEnd.[StageId] = s.[StageId]
+	stageStartEnd AS sse
+	LEFT JOIN [procfwk].[Stages] s
+		ON sse.[StageId] = s.[StageId]
 GROUP BY
-	s.[StageId],
-	s.[StageName],
+	sse.[StageId],
+	sse.[StageName],
 	s.[StageDescription]

@@ -29,7 +29,10 @@ BEGIN
 		(
 		[LocalExecutionId],
 		[StageId],
+		[StageName],
+		[StageRunOrder],
 		[PipelineId],
+		[PipelineLogicalUsageValue],
 		[CallingDataFactoryName],
 		[ResourceGroupName],
 		[DataFactoryName],
@@ -43,7 +46,10 @@ BEGIN
 	SELECT
 		[LocalExecutionId],
 		[StageId],
+		[StageName],
+		[StageRunOrder],
 		[PipelineId],
+		[PipelineLogicalUsageValue],
 		[CallingDataFactoryName],
 		[ResourceGroupName],
 		[DataFactoryName],

@@ -1,4 +1,5 @@
-﻿CREATE PROCEDURE [procfwkHelpers].[GetExecutionDetails]
+﻿
+CREATE PROCEDURE [procfwkHelpers].[GetExecutionDetails]
 	(
 	@LocalExecutionId UNIQUEIDENTIFIER = NULL
 	)
@@ -25,28 +26,33 @@ BEGIN
 
 	--Execution Summary
 	SELECT
-		CAST(el2.[StageId] AS VARCHAR(5)) + ' - ' + stgs.[StageName] AS Stage,
+		CAST(el2.[StageId] AS VARCHAR(5)) + ' - ' + ISNULL(el2.[StageName], stgs.[StageName]) AS Stage,
+		el2.[StageRunOrder],
 		COUNT(0) AS RecordCount,
 		DATEDIFF(MINUTE, MIN(el2.[StartDateTime]), MAX(el2.[EndDateTime])) DurationMinutes
 	FROM
 		[procfwk].[ExecutionLog] el2
-		INNER JOIN [procfwk].[Stages] stgs
+		LEFT JOIN [procfwk].[Stages] stgs
 			ON el2.[StageId] = stgs.[StageId]
 	WHERE
 		el2.[LocalExecutionId] = @LocalExecutionId
 	GROUP BY
-		CAST(el2.[StageId] AS VARCHAR(5)) + ' - ' + stgs.[StageName]
+		CAST(el2.[StageId] AS VARCHAR(5)) + ' - ' + ISNULL(el2.[StageName], stgs.[StageName]),
+		el2.[StageRunOrder]
 	ORDER BY
-		CAST(el2.[StageId] AS VARCHAR(5)) + ' - ' + stgs.[StageName];
+		el2.[StageRunOrder],
+		CAST(el2.[StageId] AS VARCHAR(5)) + ' - ' + ISNULL(el2.[StageName], stgs.[StageName]);
 
 	--Full execution details
 	SELECT
 		el3.[LogId],
 		el3.[LocalExecutionId],
 		el3.[StageId],
-		stgs.[StageName],
+		ISNULL(el3.[StageName], stgs.[StageName]) AS Stage,
+		el3.[StageRunOrder],
 		el3.[PipelineId],
 		el3.[PipelineName],
+		el3.[PipelineLogicalUsageValue],
 		el3.[StartDateTime],
 		el3.[EndDateTime],
 		ISNULL(DATEDIFF(MINUTE, el3.[StartDateTime], el3.[EndDateTime]),0) AS DurationMinutes,
@@ -64,11 +70,12 @@ BEGIN
 		LEFT OUTER JOIN [procfwk].[ErrorLog] errLog
 			ON el3.[LocalExecutionId] = errLog.[LocalExecutionId]
 				AND el3.[AdfPipelineRunId] = errLog.[AdfPipelineRunId]
-		INNER JOIN [procfwk].[Stages] stgs
+		LEFT JOIN [procfwk].[Stages] stgs
 			ON el3.[StageId] = stgs.[StageId]
 	WHERE
 		el3.[LocalExecutionId] = @LocalExecutionId
 	ORDER BY
+		el3.[StageRunOrder],
 		el3.[PipelineId],
 		el3.[StartDateTime];
 END;

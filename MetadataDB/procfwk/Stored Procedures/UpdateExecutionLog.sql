@@ -30,7 +30,10 @@ BEGIN
 				(
 				[LocalExecutionId],
 				[StageId],
+				[StageName],
+				[StageRunOrder],
 				[PipelineId],
+				[PipelineLogicalUsageValue],
 				[CallingDataFactoryName],
 				[ResourceGroupName],
 				[DataFactoryName],
@@ -39,13 +42,15 @@ BEGIN
 				[PipelineStatus],
 				[EndDateTime],
 				[AdfPipelineRunId],
-				[PipelineParamsUsed],
-				[StageRunOrder]
+				[PipelineParamsUsed]
 				)
 			SELECT
 				[LocalExecutionId],
 				[StageId],
+				[StageName],
+				[StageRunOrder],
 				[PipelineId],
+				[PipelineLogicalUsageValue],
 				[CallingDataFactoryName],
 				[ResourceGroupName],
 				[DataFactoryName],
@@ -54,8 +59,7 @@ BEGIN
 				[PipelineStatus],
 				[EndDateTime],
 				[AdfPipelineRunId],
-				[PipelineParamsUsed],
-				[StageRunOrder]
+				[PipelineParamsUsed]
 			FROM
 				[procfwk].[CurrentExecution];
 
@@ -111,7 +115,10 @@ BEGIN
 				(
 				[LocalExecutionId],
 				[StageId],
+				[StageName],
+				[StageRunOrder],
 				[PipelineId],
+				[PipelineLogicalUsageValue],
 				[CallingDataFactoryName],
 				[ResourceGroupName],
 				[DataFactoryName],
@@ -120,13 +127,15 @@ BEGIN
 				[PipelineStatus],
 				[EndDateTime],
 				[AdfPipelineRunId],
-				[PipelineParamsUsed],
-				[StageRunOrder]
+				[PipelineParamsUsed]
 				)
 			SELECT
 				[LocalExecutionId],
 				[StageId],
+				[StageName],
+				[StageRunOrder],
 				[PipelineId],
+				[PipelineLogicalUsageValue],
 				[CallingDataFactoryName],
 				[ResourceGroupName],
 				[DataFactoryName],
@@ -135,8 +144,7 @@ BEGIN
 				[PipelineStatus],
 				[EndDateTime],
 				[AdfPipelineRunId],
-				[PipelineParamsUsed],
-				[StageRunOrder]
+				[PipelineParamsUsed]
 			FROM
 				[procfwk].[CurrentExecution]
 			WHERE 

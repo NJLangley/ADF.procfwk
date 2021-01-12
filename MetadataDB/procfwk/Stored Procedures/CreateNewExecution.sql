@@ -39,22 +39,26 @@ BEGIN
 				(
 				[LocalExecutionId],
 				[StageId],
+				[StageName],
+				[StageRunOrder],
 				[PipelineId],
+				[PipelineLogicalUsageValue],
 				[CallingDataFactoryName],
 				[ResourceGroupName],
 				[DataFactoryName],
-				[PipelineName],
-				[StageRunOrder]
+				[PipelineName]
 				)
 			SELECT
 				@LocalExecutionId,
 				p.[StageId],
+				s.[StageName],
+				s.[StageId],
 				p.[PipelineId],
+				p.[LogicalUsageValue],
 				@CallingDataFactoryName,
 				d.[ResourceGroupName],
 				d.[DataFactoryName],
-				p.[PipelineName],
-				p.[StageId]
+				p.[PipelineName]
 			FROM
 				[procfwk].[Pipelines] p
 				INNER JOIN [procfwk].[Stages] s
@@ -109,22 +113,26 @@ BEGIN
 				(
 				[LocalExecutionId],
 				[StageId],
+				[StageName],
+				[StageRunOrder],
 				[PipelineId],
+				[PipelineLogicalUsageValue],
 				[CallingDataFactoryName],
 				[ResourceGroupName],
 				[DataFactoryName],
-				[PipelineName],
-				[StageRunOrder]
+				[PipelineName]
 				)
 			SELECT
 				@LocalExecutionId,
 				p.[StageId],
+				s.[StageName],
+				b.RunOrder,
 				p.[PipelineId],
+				p.[LogicalUsageValue],
 				@CallingDataFactoryName,
 				d.[ResourceGroupName],
 				d.[DataFactoryName],
-				p.[PipelineName],
-				b.[RunOrder]
+				p.[PipelineName]
 			FROM
 				[procfwk].[Pipelines] p
 				INNER JOIN [procfwk].[Stages] s

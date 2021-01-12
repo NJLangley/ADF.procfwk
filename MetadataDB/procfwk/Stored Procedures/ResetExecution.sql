@@ -1,4 +1,6 @@
-﻿CREATE PROCEDURE [procfwk].[ResetExecution]
+﻿
+
+CREATE PROCEDURE [procfwk].[ResetExecution]
 	(
 	@LocalExecutionId UNIQUEIDENTIFIER = NULL
 	)
@@ -13,7 +15,10 @@ BEGIN
 				(
 				[LocalExecutionId],
 				[StageId],
+				[StageName],
+				[StageRunOrder],
 				[PipelineId],
+				[PipelineLogicalUsageValue],
 				[CallingDataFactoryName],
 				[ResourceGroupName],
 				[DataFactoryName],
@@ -25,7 +30,10 @@ BEGIN
 			SELECT
 				[LocalExecutionId],
 				[StageId],
+				[StageName],
+				[StageRunOrder],
 				[PipelineId],
+				[PipelineLogicalUsageValue],
 				[CallingDataFactoryName],
 				[ResourceGroupName],
 				[DataFactoryName],
@@ -73,7 +81,10 @@ BEGIN
 				(
 				[LocalExecutionId],
 				[StageId],
+				[StageName],
+				[StageRunOrder],
 				[PipelineId],
+				[PipelineLogicalUsageValue],
 				[CallingDataFactoryName],
 				[ResourceGroupName],
 				[DataFactoryName],
@@ -85,7 +96,10 @@ BEGIN
 			SELECT
 				[LocalExecutionId],
 				[StageId],
+				[StageName],
+				[StageRunOrder],
 				[PipelineId],
+				[PipelineLogicalUsageValue],
 				[CallingDataFactoryName],
 				[ResourceGroupName],
 				[DataFactoryName],
