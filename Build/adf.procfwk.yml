@@ -1,0 +1,36 @@
+#
+#   Build projects for ADF.procfwk and publish artifacts
+#   TODO:
+#     - Add ARM template for solution to allow building test environment and running automated tests
+#     - Publish artifacts to Nuget so we can simply deploy from a pre-built and tested codebase.
+#
+
+trigger:
+- master
+- feature/json-import-export
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+steps:
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
+
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+
+# Before we can run integration tests we need to setup a clean environment. This requiures some azure resources to be created (ideally in parallel with the builds above)
+# - task: VSTest@2
+#   inputs:
+#     platform: '$(buildPlatform)'
+#     configuration: '$(buildConfiguration)'
