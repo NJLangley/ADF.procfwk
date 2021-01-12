@@ -1,4 +1,4 @@
-﻿CREATE TABLE [procfwk].[ExecutionLog] 
+CREATE TABLE [procfwk].[ExecutionLog] 
     (
     [LogId]            INT              IDENTITY (1, 1) NOT NULL,
     [LocalExecutionId] UNIQUEIDENTIFIER NOT NULL,
@@ -15,8 +15,8 @@
     [PipelineRunId] UNIQUEIDENTIFIER NULL,
     [PipelineParamsUsed] NVARCHAR(MAX) NULL DEFAULT ('None'), 
     [StageRunOrder]    INT              NULL,
+    [StageName]                 VARCHAR (255)    NULL,
+    [PipelineLogicalUsageValue] VARCHAR (255)    NULL,
     CONSTRAINT [PK_ExecutionLog] PRIMARY KEY CLUSTERED ([LogId] ASC)
     );
-
-
 

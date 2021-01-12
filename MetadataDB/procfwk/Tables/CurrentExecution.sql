@@ -15,8 +15,12 @@
     [PipelineRunId] UNIQUEIDENTIFIER NULL,
     [PipelineParamsUsed] NVARCHAR(MAX) NULL,
     [StageRunOrder] INT NOT NULL,
+    [StageName]                 VARCHAR (255)    NULL,
+    [PipelineLogicalUsageValue] VARCHAR (255)    NULL,
     CONSTRAINT [PK_CurrentExecution] PRIMARY KEY CLUSTERED ([LocalExecutionId] ASC, [StageId] ASC, [PipelineId] ASC)
 );
+
+
 
 
 GO

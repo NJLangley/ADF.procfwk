@@ -39,7 +39,10 @@ BEGIN
 				(
 				[LocalExecutionId],
 				[StageId],
+				[StageName],
+				[StageRunOrder],
 				[PipelineId],
+				[PipelineLogicalUsageValue],
 				[CallingOrchestratorName],
 				[ResourceGroupName],
 				[OrchestratorType],
@@ -49,7 +52,10 @@ BEGIN
 			SELECT
 				@LocalExecutionId,
 				p.[StageId],
+				s.[StageName],
+				s.[StageId],
 				p.[PipelineId],
+				p.[LogicalUsageValue],
 				@CallingOrchestratorName,
 				d.[ResourceGroupName],
 				d.[OrchestratorType],
@@ -109,7 +115,10 @@ BEGIN
 				(
 				[LocalExecutionId],
 				[StageId],
+				[StageName],
+				[StageRunOrder],
 				[PipelineId],
+				[PipelineLogicalUsageValue],
 				[CallingOrchestratorName],
 				[ResourceGroupName],
 				[OrchestratorType],
@@ -119,7 +128,10 @@ BEGIN
 			SELECT
 				@LocalExecutionId,
 				p.[StageId],
+				s.[StageName],
+				b.RunOrder,
 				p.[PipelineId],
+				p.[LogicalUsageValue],
 				@CallingOrchestratorName,
 				d.[ResourceGroupName],
 				d.[OrchestratorType],

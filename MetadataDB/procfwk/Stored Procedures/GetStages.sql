@@ -31,6 +31,6 @@ BEGIN
 		AND ISNULL([PipelineStatus],'') <> 'Success'
 	GROUP BY
 		[StageId]
-	ORDER BY
-		Min([StageRunOrder]) ASC
+	ORDER BY 
+		Min(IsNull([StageRunOrder], StageId)) ASC
 END;
