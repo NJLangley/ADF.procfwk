@@ -1,2 +1,3 @@
 ﻿CREATE SCHEMA [procfwkHelpers]
-AUTHORIZATION [dbo];
+    AUTHORIZATION [dbo];
+

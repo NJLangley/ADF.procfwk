@@ -225,13 +225,14 @@
     <Build Include="procfwkHelpers\Stored Procedures\ImportPipelineParametersFromJson.sql" />
     <Build Include="procfwkHelpers\Stored Procedures\ImportpipelineDependenciesFromJson.sql" />
     <Build Include="procfwkHelpers\Stored Procedures\ImportPipelineAlertingFromJson.sql" />
-    <Build Include="procfwkHelpers\Stored Procedures\ImportDataFactoriesFromJson.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\ImportOrchestratorsFromJson.sql" />
     <Build Include="procfwkHelpers\Stored Procedures\ImportConfigFromJson.sql" />
     <Build Include="procfwkHelpers\Stored Procedures\ImportBatchStageLinkFromJson.sql" />
     <Build Include="procfwkHelpers\Stored Procedures\ImportBatchesFromJson.sql" />
     <Build Include="procfwkHelpers\Stored Procedures\ImportAlertRecipientsFromJson.sql" />
     <Build Include="procfwkHelpers\Stored Procedures\ExportConfigAsJson.sql" />
     <Build Include="procfwkReporting\Views\CurrentBatchExecutionSummary.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\ImportPipelineAuthLinkFromJson.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Script.PostDeployment.sql" />

@@ -40,42 +40,37 @@ BEGIN
                                                    ,@dropExisting;
 
     EXEC procfwkHelpers.ImportOrchestratorsFromJson @json
-                                                   ,@importIds
                                                    ,@dropExisting;
 
     EXEC procfwkHelpers.ImportServicePrincipalsFromJson @json
                                                        ,@dropExisting;
 
     EXEC procfwkHelpers.ImportAlertRecipientsFromJson @json
-                                                     ,@importIds
                                                      ,@dropExisting;
 
     EXEC procfwkHelpers.ImportBatchesFromJson @json
                                              ,@dropExisting;
 
     EXEC procfwkHelpers.ImportStagesFromJson @json
-                                            ,@importIds
                                             ,@dropExisting;
 
     EXEC procfwkHelpers.ImportBatchStageLinkFromJson @json
                                                     ,@dropExisting;
                                                     
     EXEC procfwkHelpers.ImportPipelinesFromJson @json
-                                               ,@importIds
                                                ,@dropExisting;
 
     EXEC procfwkHelpers.ImportpipelineDependenciesFromJson @json
-                                                          ,@importIds
                                                           ,@dropExisting;
 
     EXEC procfwkHelpers.ImportPipelineParametersFromJson @json
-                                                        --,@importIds
                                                         ,@dropExisting;
 
     EXEC procfwkHelpers.ImportPipelineAlertingFromJson @json
-                                                    --,@importIds
                                                       ,@dropExisting;
 
+    EXEC procfwkHelpers.ImportPipelineAuthLinkFromJson @json
+                                                      ,@dropExisting;
                                                           
                                                 
     COMMIT;

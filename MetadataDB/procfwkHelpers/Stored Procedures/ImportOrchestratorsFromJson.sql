@@ -1,7 +1,6 @@
 ﻿CREATE PROCEDURE procfwkHelpers.ImportOrchestratorsFromJson
 (
   @json NVARCHAR(MAX)
- ,@importIds BIT = 0
  ,@dropExisting BIT = 0
 )
 AS
