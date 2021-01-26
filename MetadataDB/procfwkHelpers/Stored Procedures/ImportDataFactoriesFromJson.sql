@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE procfwkHelpers.ImportDataFactoriesFromJson
+﻿CREATE PROCEDURE procfwkHelpers.ImportOrchestratorsFromJson
 (
   @json NVARCHAR(MAX)
  ,@importIds BIT = 0
@@ -17,39 +17,45 @@ BEGIN
     IF IsJson(@json) = 0
       RAISERROR('The json is not valid', 16, 1);
 
-    DROP TABLE IF EXISTS #dataFactories;
+    DROP TABLE IF EXISTS #orchestrators;
     DROP TABLE IF EXISTS #outputActions;
     CREATE TABLE #outputActions (mergeAction VARCHAR(20));
 
     SELECT *
-    INTO #dataFactories
+    INTO #orchestrators
     FROM
-      OpenJson( Json_Query( @json, '$.dataFactories' ) )
+      OpenJson( Json_Query( @json, '$.orchestrators' ) )
       WITH (
-        [DataFactoryName] [nvarchar] (200) '$.name'
+        [OrchestratorName] [nvarchar] (200) '$.name'
+       ,[OrchestratorType] CHAR(3) '$.type'
+	   ,[IsFrameworkOrchestrator] BIT '$.isFrameworkOrchestrator'
        ,[ResourceGroupName] [nvarchar] (200) '$.resourceGroupName'
        ,[SubscriptionId] [uniqueidentifier] '$.subscriptionId'
        ,[Description] [nvarchar] (max) '$.description'
       );
 
     
-    -- Merge dataFactories
-    MERGE INTO procfwk.DataFactorys AS t
+    -- Merge orchestrators
+    MERGE INTO procfwk.Orchestrators AS t
     USING (SELECT *
-           FROM #dataFactories
+           FROM #orchestrators
           )AS s
-    ON t.DataFactoryName = s.DataFactoryName
+    ON t.OrchestratorName = s.OrchestratorName
     WHEN NOT MATCHED BY TARGET
-      THEN INSERT (DataFactoryName, ResourceGroupName, SubscriptionId, Description)
-           VALUES (s.DataFactoryName, s.ResourceGroupName, s.SubscriptionId, s.Description)
+      THEN INSERT (OrchestratorName, OrchestratorType, IsFrameworkOrchestrator, ResourceGroupName, SubscriptionId, Description)
+           VALUES (s.OrchestratorName, s.OrchestratorType, s.IsFrameworkOrchestrator, s.ResourceGroupName, s.SubscriptionId, s.Description)
     WHEN MATCHED
          AND (
-               IsNull(t.ResourceGroupName, '') <> IsNull(s.ResourceGroupName, '')
+               IsNull(t.OrchestratorType, '') <> IsNull(s.OrchestratorType, '')
+               OR IsNull(t.IsFrameworkOrchestrator, '') <> IsNull(s.IsFrameworkOrchestrator, '')
+               OR IsNull(t.ResourceGroupName, '') <> IsNull(s.ResourceGroupName, '')
                OR IsNull(t.SubscriptionId, '') <> IsNull(s.SubscriptionId, '')
                OR IsNull(t.Description, '') <> IsNull(s.Description, '')
              )
       THEN UPDATE 
-             SET ResourceGroupName = s.ResourceGroupName
+             SET OrchestratorType = s.OrchestratorType
+                ,IsFrameworkOrchestrator = s.IsFrameworkOrchestrator
+                ,ResourceGroupName = s.ResourceGroupName
                 ,SubscriptionId = s.SubscriptionId
                 ,Description = s.Description
     WHEN NOT MATCHED BY SOURCE
@@ -57,7 +63,7 @@ BEGIN
       THEN DELETE
     OUTPUT $action INTO #outputActions;
 
-    DECLARE @sourceRows INT = (SELECT Count(*) FROM #dataFactories)
+    DECLARE @sourceRows INT = (SELECT Count(*) FROM #orchestrators)
            ,@insertedRows INT = (SELECT Count(*) FROM #outputActions WHERE mergeAction = 'INSERT')
            ,@updatedRows INT = (SELECT Count(*) FROM #outputActions WHERE mergeAction = 'UPDATE')
            ,@deletedRows INT = (SELECT Count(*) FROM #outputActions WHERE mergeAction = 'DELETE');

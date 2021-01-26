@@ -1,13 +1,7 @@
-﻿
-
-
-
-
-CREATE   PROCEDURE procfwkHelpers.ExportConfigAsJson
+﻿CREATE   PROCEDURE procfwkHelpers.ExportConfigAsJson
 (
   @prettyPrintJson BIT = 1
  ,@jsonNestingSpaces INT = 4
- ,@exportIds BIT = 0
  ,@json NVARCHAR(MAX) OUTPUT
 )
 AS
@@ -36,25 +30,24 @@ BEGIN
                         FROM procfwk.Subscriptions AS s
                         FOR JSON PATH
                        )AS subscriptions
-                      ,(SELECT CASE WHEN @exportIds = 1 THEN df.DataFactoryId ELSE NULL END AS DataFactoryId
-                              ,df.DataFactoryName AS [name]
-                              ,df.ResourceGroupName AS resourceGroupName
-                              ,df.SubscriptionId AS subscriptionId
-                              ,df.Description AS [description]
-                        FROM procfwk.DataFactorys AS df
+                      ,(SELECT o.OrchestratorName AS [name]
+                              ,o.OrchestratorType AS [type]
+                              ,o.IsFrameworkOrchestrator AS isFrameworkOrchestrator
+                              ,o.ResourceGroupName AS resourceGroupName
+                              ,o.SubscriptionId AS subscriptionId
+                              ,o.Description AS [description]
+                        FROM procfwk.Orchestrators AS o
                         FOR JSON PATH
-                       )AS dataFactories
-                      ,(SELECT CASE WHEN @exportIds = 1 THEN sp.CredentialId ELSE NULL END AS CredentialId
-                              ,sp.PrincipalName AS [name]
+                       )AS orchestrators
+                      ,(SELECT sp.PrincipalName AS [name]
                               ,sp.PrincipalId AS principalId
-                              ,CASE WHEN sp.PrincipalId IS NOT NULL THEN '{{principal_secret_' + Cast(principalId AS CHAR(36)) + '}}' ELSE NULL END AS [secret]
+                              ,CASE WHEN sp.PrincipalId IS NOT NULL THEN '{{principal_secret_' + Cast(PrincipalId AS CHAR(36)) + '}}' ELSE NULL END AS [secret]
                               ,sp.PrincipalIdUrl AS principalIdKeyVaultUrl
                               ,sp.PrincipalSecretUrl AS secretKeyVaultUrl
                         FROM dbo.ServicePrincipals AS sp
                         FOR JSON PATH
                        )AS servicePrincipals
-                      ,(SELECT CASE WHEN @exportIds = 1 THEN r.RecipientId ELSE NULL END AS RecipientId
-                              ,r.Name AS [name]
+                      ,(SELECT r.Name AS [name]
                               ,r.EmailAddress AS emailAddress
                               ,r.MessagePreference AS messagePreference
                               ,r.Enabled AS [enabled]
@@ -77,24 +70,22 @@ BEGIN
                         FROM procfwk.Batches AS b
                         FOR JSON PATH
                        )AS batches
-                      ,(SELECT CASE WHEN @exportIds = 1 THEN s.StageId ELSE NULL END AS StageId
-                              ,s.StageName AS [name]
+                      ,(SELECT s.StageName AS [name]
                               ,s.StageDescription AS [description]
                               ,s.Enabled AS [enabled]
                         FROM procfwk.Stages AS s
                         FOR JSON PATH
                        )AS stages
-                      ,(SELECT p.PipelineId AS Id
-                              ,p.PipelineName AS [name]
+                      ,(SELECT --p.PipelineId AS Id
+                               p.PipelineName AS [name]
                               ,p.Enabled AS [enabled]
                               ,p.LogicalUsageValue AS logicalUsageValue
                               ,(SELECT plp.LogicalUsageValue
                                 FROM procfwk.Pipelines AS plp 
                                 WHERE plp.PipelineId = p.LogicalPredecessorId
                                )AS logicalPredecessorLogicalUsageValue
-                              --,p.LogicalPredecessorId AS logicalPredecessorId
                               ,s.StageName AS stageName
-                              ,df.DataFactoryName AS dataFactoryName
+                              ,o.OrchestratorName AS orchestratorName
                               ,sp.PrincipalName AS servicePrincipalName
                               ,(SELECT pp.ParameterName AS parameterName
                                       ,pp.ParameterValue AS parameterValue
@@ -103,13 +94,13 @@ BEGIN
                                 FOR JSON PATH
                                )AS [parameters]
                               /*
-                                This exports all PipelineAuthLink records, not just the SP used for the data factory defined on the pipeline
+                                This exports all PipelineAuthLink records, not just the SP used for the orchestrator defined on the pipeline
 
-                              ,(SELECT df2.DataFactoryName AS dataFactoryName
+                              ,(SELECT df2.OrchestratorName AS orchestratorName
                                       ,sp2.PrincipalName AS principalName
                                 FROM procfwk.PipelineAuthLink AS pal2
-                                INNER JOIN procfwk.DataFactorys AS df2
-                                  ON df2.DataFactoryId = pal2.DataFactoryId
+                                INNER JOIN procfwk.Orchestrators AS df2
+                                  ON df2.OrchestratorId = pal2.OrchestratorId
                                 INNER JOIN dbo.ServicePrincipals AS sp2
                                   ON sp2.CredentialId = pal2.CredentialId
                                 WHERE pal2.PipelineId = p.PipelineId
@@ -143,11 +134,11 @@ BEGIN
                         FROM procfwk.Pipelines AS p
                         INNER JOIN procfwk.Stages AS s
                           ON s.StageId = p.StageId
-                        INNER JOIN procfwk.DataFactorys AS df
-                          ON df.DataFactoryId = p.DataFactoryId
+                        INNER JOIN procfwk.Orchestrators AS o
+                          ON o.OrchestratorId = p.OrchestratorId
                         LEFT JOIN procfwk.PipelineAuthLink AS pal
                           ON pal.PipelineId = p.PipelineId
-                             AND pal.DataFactoryId = p.DataFactoryId
+                             AND pal.OrchestratorId = p.OrchestratorId
                         LEFT JOIN dbo.ServicePrincipals AS sp
                           ON sp.CredentialId = pal.CredentialId
                         FOR JSON PATH

@@ -171,7 +171,11 @@ BEGIN
 		CASE
 			WHEN (ROW_NUMBER() OVER (ORDER BY b.[BatchName] DESC) * 1) % maxStages.[Id] = 0 THEN maxStages.[Id] 
 			ELSE (ROW_NUMBER() OVER (ORDER BY b.[BatchName] DESC) * 1) % maxStages.[Id] 
-		END AS Stage
+		END AS Stage,
+		CASE
+			WHEN (ROW_NUMBER() OVER (ORDER BY b.[BatchName] DESC) * 1) % maxStages.[Id] = 0 THEN maxStages.[Id] 
+			ELSE (ROW_NUMBER() OVER (ORDER BY b.[BatchName] DESC) * 1) % maxStages.[Id] 
+		END AS RunOrder
 	FROM 
 		[procfwk].[Batches] b
 		CROSS JOIN maxStages;

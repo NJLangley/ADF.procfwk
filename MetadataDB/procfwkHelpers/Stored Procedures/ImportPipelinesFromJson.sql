@@ -27,7 +27,7 @@ BEGIN
         Id INT '$.Id'
        ,PipelineName NVARCHAR(200) '$.name'
        ,LogicalPredecessorLogicalUsageValue NVARCHAR(200) '$.logicalPredecessorLogicalUsageValue'
-       ,DataFactoryName [nvarchar] (200) '$.dataFactoryName'
+       ,OrchestratorName [nvarchar] (200) '$.orchestratorName'
        ,StageName [varchar] (255) '$.stageName'
        ,ServicePrincipalName [nvarchar] (256) '$.servicePrincipalName'
        ,LogicalUsageValue VARCHAR(255) '$.logicalUsageValue'
@@ -44,32 +44,32 @@ BEGIN
     )
 
     MERGE INTO procfwk.Pipelines AS t
-    USING (SELECT df.DataFactoryId
+    USING (SELECT o.OrchestratorId
                  ,s.StageId
                  ,p.PipelineName
                  ,p.LogicalPredecessorLogicalUsageValue
                  ,p.Enabled
                  ,p.LogicalUsageValue
            FROM #pipelines AS p
-           INNER JOIN procfwk.DataFactorys AS df
-             ON df.DataFactoryName = p.DataFactoryName
+           INNER JOIN procfwk.Orchestrators AS o
+             ON o.OrchestratorName = p.OrchestratorName
            INNER JOIN procfwk.Stages AS s
              ON s.StageName = p.StageName
           )AS S
     ON t.LogicalUsageValue = s.LogicalUsageValue
     WHEN NOT MATCHED BY TARGET
-      THEN INSERT (DataFactoryId, StageId, PipelineName, Enabled, LogicalUsageValue)
-           VALUES (s.DataFactoryId, s.StageId, s.PipelineName, s.Enabled, s.LogicalUsageValue)
+      THEN INSERT (OrchestratorId, StageId, PipelineName, Enabled, LogicalUsageValue)
+           VALUES (s.OrchestratorId, s.StageId, s.PipelineName, s.Enabled, s.LogicalUsageValue)
     WHEN MATCHED
          AND (
-               IsNull(t.DataFactoryId, '') <> IsNull(s.DataFactoryId, '')
+               IsNull(t.OrchestratorId, '') <> IsNull(s.OrchestratorId, '')
                OR IsNull(t.StageId, '') <> IsNull(s.StageId, '')
                OR IsNull(t.PipelineName, '') <> IsNull(s.PipelineName, '')
                OR IsNull(t.Enabled, '') <> IsNull(s.Enabled, '')
                OR s.LogicalPredecessorLogicalUsageValue IS NOT NULL
              )
       THEN UPDATE 
-             SET DataFactoryId = s.DataFactoryId
+             SET OrchestratorId = s.OrchestratorId
                 ,StageId = s.StageId
                 ,PipelineName = s.PipelineName
                 ,Enabled = s.Enabled

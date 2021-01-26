@@ -1,4 +1,4 @@
-﻿CREATE   FUNCTION dbo.PrettyPrintJson(@Json NVARCHAR(Max), @NestingSpaces int = 4)
+﻿CREATE FUNCTION dbo.PrettyPrintJson(@json NVARCHAR(Max), @NestingSpaces int = 4)
 RETURNS NVARCHAR(Max)
 WITH SCHEMABINDING
 AS

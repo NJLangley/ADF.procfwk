@@ -6,10 +6,12 @@ BEGIN
 	INSERT INTO [procfwk].[BatchStageLink]
 		(
 		[BatchId],
-		[StageId]
+		[StageId],
+		[RunOrder]
 		)
 	SELECT
 		b.[BatchId],
+		s.[StageId],
 		s.[StageId]
 	FROM
 		[procfwk].[Batches] b
@@ -22,6 +24,7 @@ BEGIN
 
 	SELECT
 		b.[BatchId],
+		s.[StageId],
 		s.[StageId]
 	FROM
 		[procfwk].[Batches] b

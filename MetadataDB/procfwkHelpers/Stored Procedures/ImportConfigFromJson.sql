@@ -39,7 +39,7 @@ BEGIN
     EXEC procfwkHelpers.ImportSubscriptionsFromJson @json
                                                    ,@dropExisting;
 
-    EXEC procfwkHelpers.ImportDataFactoriesFromJson @json
+    EXEC procfwkHelpers.ImportOrchestratorsFromJson @json
                                                    ,@importIds
                                                    ,@dropExisting;
 
