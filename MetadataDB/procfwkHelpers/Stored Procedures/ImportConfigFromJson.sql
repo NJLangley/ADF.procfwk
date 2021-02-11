@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE procfwkHelpers.ImportConfigFromJson
+﻿CREATE PROCEDURE [procfwkHelpers].[ImportConfigFromJson]
 (
   @json NVARCHAR(MAX)
  ,@importIds BIT = 0
@@ -7,6 +7,20 @@
 AS
 BEGIN
   SET XACT_ABORT, NOCOUNT ON;
+
+  EXEC procfwkHelpers.CreateMetadataSnapshot @Comments = 'Pre-deployment Backup';
+
+  -- We want to make sure that there is nothing running during the deployment, and block anything trying to start during the deployment, so use serializable.
+  SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+  BEGIN TRANSACTION;
+
+  DECLARE @isFrameworkRunning INT;
+  EXEC @isFrameworkRunning = procfwkHelpers.IsFrameworkRunning;
+
+  IF @isFrameworkRunning = 1
+  BEGIN
+    RAISERROR('Cannot deploy new metadata while there are batches running. Allow all jobs to finish, or cleanm up the procfwk.CurrentExecution & procfwk.BatchExecution tables.', 16, 1);
+  END
 
   PRINT Replicate(Char(10), 2) + Replicate('-', 180);
   PRINT 'Running proc: ' + (Object_Schema_Name(@@procId) + '.' + Object_Name(@@procId));
@@ -17,7 +31,6 @@ BEGIN
   PRINT '         Drop existing metadata: ' + (CASE WHEN @dropExisting = 1 THEN 'Yes' ELSE 'No' END) + Char(10)
 
 
-  BEGIN TRANSACTION;
   BEGIN TRY
     IF IsJson(@json) = 0
       RAISERROR('The json is not valid', 16, 1);
@@ -72,7 +85,8 @@ BEGIN
     EXEC procfwkHelpers.ImportPipelineAuthLinkFromJson @json
                                                       ,@dropExisting;
                                                           
-                                                
+           
+    EXEC procfwkHelpers.CreateMetadataSnapshot @Comments = 'Post-deployment Backup';
     COMMIT;
   END TRY
 
