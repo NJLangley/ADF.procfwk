@@ -10,6 +10,12 @@ BEGIN
 
   EXEC procfwkHelpers.CreateMetadataSnapshot @Comments = 'Pre-deployment Backup';
 
+  DECLARE @metadataPreDeploymentSnapshotIds INT;
+  INSERT INTO procfwkHelpers.MetadataSnapshot (SnapshotJson, Comments)
+  VALUES (@json, 'Deployment Metadata');
+  SET @metadataPreDeploymentSnapshotIds = @@identity;
+  
+
   -- We want to make sure that there is nothing running during the deployment, and block anything trying to start during the deployment, so use serializable.
   SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
   BEGIN TRANSACTION;
@@ -86,7 +92,11 @@ BEGIN
                                                       ,@dropExisting;
                                                           
            
-    EXEC procfwkHelpers.CreateMetadataSnapshot @Comments = 'Post-deployment Backup';
+    UPDATE procfwkHelpers.MetadataSnapshot
+    SET SnapshotDateTime = GetDate()
+       ,Comments = 'Successful Deployment Metadata'
+    WHERE Id = @metadataPreDeploymentSnapshotIds;
+
     COMMIT;
   END TRY
 
@@ -95,6 +105,11 @@ BEGIN
     IF @@tranCount > 0
       ROLLBACK;
     
+    UPDATE procfwkHelpers.MetadataSnapshot
+    SET SnapshotDateTime = GetDate()
+       ,Comments = 'Successful Deployment Metadata'
+    WHERE Id = @metadataPreDeploymentSnapshotIds;
+
     THROW;
   END CATCH
 END
