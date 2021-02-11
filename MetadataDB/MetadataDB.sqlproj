@@ -82,6 +82,7 @@
     <Folder Include="procfwkHelpers\Views" />
     <Folder Include="procfwkTesting\Stored Procedures" />
     <Folder Include="dbo\Functions\" />
+    <Folder Include="procfwkHelpers\Tables\" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="procfwk\Tables\Pipelines.sql" />
@@ -232,6 +233,9 @@
     <Build Include="procfwkHelpers\Stored Procedures\ExportConfigAsJson.sql" />
     <Build Include="procfwkReporting\Views\CurrentBatchExecutionSummary.sql" />
     <Build Include="procfwkHelpers\Stored Procedures\ImportPipelineAuthLinkFromJson.sql" />
+    <Build Include="procfwkHelpers\Tables\MetadataSnapshot.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\IsFrameworkRunning.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\CreateMetadataSnapshot.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Script.PostDeployment.sql" />
