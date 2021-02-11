@@ -44,8 +44,8 @@ BEGIN
     IF @dropExisting = 1
     BEGIN
       PRINT 'Running framework cleanup process...'
-      PRINT '  - Calling procfwkTesting.CleanUpMetadata' + Char(10)
-      EXEC procfwkTesting.CleanUpMetadata;
+      PRINT '  - Calling procfwkHelpers.DeleteMetadataWithIntegrity' + Char(10)
+      EXEC procfwkHelpers.DeleteMetadataWithIntegrity;
     END
 
     PRINT Char(10) + 'Updating framework metadata...'
