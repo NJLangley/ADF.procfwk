@@ -27,12 +27,25 @@ BEGIN
         Id INT '$.Id'
        ,PipelineName NVARCHAR(200) '$.name'
        ,LogicalPredecessorLogicalUsageValue NVARCHAR(200) '$.logicalPredecessorLogicalUsageValue'
-       ,OrchestratorName [nvarchar] (200) '$.orchestratorName'
+       ,OrchestratorSlug [nvarchar] (200) '$.orchestratorSlug'
        ,StageName [varchar] (255) '$.stageName'
        ,ServicePrincipalName [nvarchar] (256) '$.servicePrincipalName'
        ,LogicalUsageValue VARCHAR(255) '$.logicalUsageValue'
        ,Enabled bit '$.enabled'
       ) AS p
+
+
+    -- The orchestrator name is env specific, so the json uses the slug to join stuff together...
+    DROP TABLE IF EXISTS #orchestrators;
+    
+    SELECT *
+    INTO #orchestrators
+    FROM
+      OpenJson( Json_Query( @json, '$.orchestrators' ) )
+      WITH (
+        [OrchestratorName] [nvarchar] (200) '$.name'
+       ,[OrchestratorSlug] [nvarchar] (200) '$.slug'
+      );
     
 
     -- Merge pipelines. Have to merge the pipelines, then set the LogicalPredecessorId after as it is a fk
@@ -51,9 +64,11 @@ BEGIN
                  ,p.Enabled
                  ,p.LogicalUsageValue
            FROM #pipelines AS p
-           INNER JOIN procfwk.Orchestrators AS o
-             ON o.OrchestratorName = p.OrchestratorName
-           INNER JOIN procfwk.Stages AS s
+           LEFT JOIN #orchestrators AS os
+             ON os.OrchestratorSlug = p.OrchestratorSlug
+           LEFT JOIN procfwk.Orchestrators AS o
+             ON o.OrchestratorName = os.OrchestratorName
+           LEFT JOIN procfwk.Stages AS s
              ON s.StageName = p.StageName
           )AS S
     ON t.LogicalUsageValue = s.LogicalUsageValue

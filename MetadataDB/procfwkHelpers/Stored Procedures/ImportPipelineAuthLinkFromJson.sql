@@ -21,7 +21,7 @@ BEGIN
     CREATE TABLE #outputActions (mergeAction VARCHAR(20));
 
     SELECT p.LogicalUsageValue
-          ,p.OrchestratorName
+          ,p.OrchestratorSlug
           ,p.ServicePrincipalName
     INTO #pipelineAuthLink
     FROM
@@ -29,15 +29,23 @@ BEGIN
       WITH (
         Id INT '$.Id'
        ,LogicalUsageValue VARCHAR(255) '$.logicalUsageValue'
-       ,OrchestratorName VARCHAR(200) '$.orchestratorName'
+       ,OrchestratorSlug [nvarchar] (200) '$.orchestratorSlug'
        ,ServicePrincipalName VARCHAR(256) '$.servicePrincipalName'
       ) AS p
-    --LEFT JOIN procfwk.Pipelines AS p2
-    --  ON p2.LogicalUsageValue = p.LogicalUsageValue
-    --LEFT JOIN procfwk.Orchestrators AS df
-    --  ON df.OrchestratorName = p.OrchestratorName
-    --LEFT JOIN dbo.ServicePrincipals AS sp
-    --  ON sp.PrincipalName = p.ServicePrincipalName
+         
+
+    -- The orchestrator name is env specific, so the json uses the slug to join stuff together...
+    DROP TABLE IF EXISTS #orchestrators;
+    
+    SELECT *
+    INTO #orchestrators
+    FROM
+      OpenJson( Json_Query( @json, '$.orchestrators' ) )
+      WITH (
+        [OrchestratorName] [nvarchar] (200) '$.name'
+       ,[OrchestratorSlug] [nvarchar] (200) '$.slug'
+      );
+
   
     -- Merge BatchStageLink
     MERGE INTO procfwk.PipelineAuthLink AS t
@@ -45,10 +53,12 @@ BEGIN
                  ,o.OrchestratorId
                  ,sp.CredentialId
            FROM #pipelineAuthLink AS pal
+           LEFT JOIN #orchestrators AS os
+             ON os.OrchestratorSlug = pal.OrchestratorSlug
            LEFT JOIN procfwk.Pipelines AS p
              ON p.LogicalUsageValue = pal.LogicalUsageValue
            LEFT JOIN procfwk.Orchestrators AS o
-             ON o.OrchestratorName = pal.OrchestratorName
+             ON o.OrchestratorName = os.OrchestratorName
            LEFT JOIN dbo.ServicePrincipals AS sp
              ON sp.PrincipalName = pal.ServicePrincipalName
           )AS S

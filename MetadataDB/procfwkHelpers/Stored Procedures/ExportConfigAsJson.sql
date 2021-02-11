@@ -1,4 +1,4 @@
-﻿CREATE   PROCEDURE procfwkHelpers.ExportConfigAsJson
+﻿CREATE PROCEDURE procfwkHelpers.ExportConfigAsJson
 (
   @prettyPrintJson BIT = 1
  ,@jsonNestingSpaces INT = 4
@@ -31,6 +31,7 @@ BEGIN
                         FOR JSON PATH
                        )AS subscriptions
                       ,(SELECT o.OrchestratorName AS [name]
+                              ,o.OrchestratorName AS [slug]
                               ,o.OrchestratorType AS [type]
                               ,o.IsFrameworkOrchestrator AS isFrameworkOrchestrator
                               ,o.ResourceGroupName AS resourceGroupName
@@ -85,7 +86,7 @@ BEGIN
                                 WHERE plp.PipelineId = p.LogicalPredecessorId
                                )AS logicalPredecessorLogicalUsageValue
                               ,s.StageName AS stageName
-                              ,o.OrchestratorName AS orchestratorName
+                              ,o.OrchestratorName AS orchestratorSlug
                               ,sp.PrincipalName AS servicePrincipalName
                               ,(SELECT pp.ParameterName AS parameterName
                                       ,pp.ParameterValue AS parameterValue
