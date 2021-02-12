@@ -57,7 +57,7 @@ BEGIN
                        )AS alertRecipients
                       ,(SELECT b.BatchId AS id
                               ,b.BatchName + '' AS [name]
-                              ,b.BatchDescription + ']' AS [description]
+                              ,b.BatchDescription AS [description]
                               ,b.Enabled AS [enabled]
                               ,Json_Query(Replace(Replace((SELECT s.StageName
                                                            FROM procfwk.BatchStageLink AS bsl
