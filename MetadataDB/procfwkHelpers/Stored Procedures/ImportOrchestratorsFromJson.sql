@@ -1,7 +1,7 @@
 ﻿CREATE PROCEDURE procfwkHelpers.ImportOrchestratorsFromJson
 (
   @json NVARCHAR(MAX)
- ,@dropExisting BIT = 0
+ ,@deleteItemsNotInJson BIT = 0
 )
 AS
 BEGIN
@@ -58,7 +58,7 @@ BEGIN
                 ,SubscriptionId = s.SubscriptionId
                 ,Description = s.Description
     WHEN NOT MATCHED BY SOURCE
-         AND @dropExisting = 1
+         AND @deleteItemsNotInJson = 1
       THEN DELETE
     OUTPUT $action INTO #outputActions;
 

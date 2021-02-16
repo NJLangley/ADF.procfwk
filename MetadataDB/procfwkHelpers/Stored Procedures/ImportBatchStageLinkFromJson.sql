@@ -1,7 +1,7 @@
 ﻿CREATE PROCEDURE procfwkHelpers.ImportBatchStageLinkFromJson
 (
   @json NVARCHAR(MAX)
- ,@dropExisting BIT = 0
+ ,@deleteItemsNotInJson BIT = 0
 )
 AS
 BEGIN
@@ -53,7 +53,7 @@ BEGIN
       THEN UPDATE 
              SET RunOrder = s.RunOrder
     WHEN NOT MATCHED BY SOURCE
-         AND @dropExisting = 1
+         AND @deleteItemsNotInJson = 1
       THEN DELETE
     OUTPUT $action INTO #outputActions;
 

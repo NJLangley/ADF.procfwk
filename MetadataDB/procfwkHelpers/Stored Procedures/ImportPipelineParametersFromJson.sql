@@ -2,7 +2,7 @@
 (
   @json NVARCHAR(MAX)
  ,@importIds BIT = 0
- ,@dropExisting BIT = 0
+ ,@deleteItemsNotInJson BIT = 0
 )
 AS
 BEGIN
@@ -58,7 +58,7 @@ BEGIN
       THEN UPDATE 
              SET ParameterValue = s.ParameterValue
     WHEN NOT MATCHED BY SOURCE
-         AND @dropExisting = 1
+         AND @deleteItemsNotInJson = 1
       THEN DELETE
     OUTPUT $action INTO #outputActions;
 

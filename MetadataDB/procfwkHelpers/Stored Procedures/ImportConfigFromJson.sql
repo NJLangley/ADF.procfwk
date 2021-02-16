@@ -3,6 +3,7 @@
   @json NVARCHAR(MAX)
  ,@importIds BIT = 0
  ,@dropExisting BIT = 0
+ ,@deleteItemsNotInJson BIT = 0
 )
 AS
 BEGIN
@@ -33,8 +34,9 @@ BEGIN
   PRINT Replicate('-', 180);
   
   PRINT 'Loading configuration from JSON.'
-  PRINT 'Options: Import ID''s:            ' + (CASE WHEN @importIds = 1 THEN 'Yes' ELSE 'No' END)
-  PRINT '         Drop existing metadata: ' + (CASE WHEN @dropExisting = 1 THEN 'Yes' ELSE 'No' END) + Char(10)
+  PRINT 'Options: Import ID''s:                      ' + (CASE WHEN @importIds = 1 THEN 'Yes' ELSE 'No' END)
+  PRINT '         Drop existing metadata:            ' + (CASE WHEN @dropExisting = 1 THEN 'Yes' ELSE 'No' END) + Char(10)
+  PRINT '         Delete metadata items not in JSON: ' + (CASE WHEN @deleteItemsNotInJson = 1 THEN 'Yes' ELSE 'No' END) + Char(10)
 
 
   BEGIN TRY
@@ -45,51 +47,53 @@ BEGIN
     BEGIN
       PRINT 'Running framework cleanup process...'
       PRINT '  - Calling procfwkHelpers.DeleteMetadataWithIntegrity' + Char(10)
-      EXEC procfwkHelpers.DeleteMetadataWithIntegrity;
+      EXEC procfwkHelpers.DeleteMetadataWithIntegrity @deleteLogs = 0
+                                                     ,@deleteCurrentExecutions = 0
+                                                     ,@reseedIdentity = 0;
     END
 
     PRINT Char(10) + 'Updating framework metadata...'
 
-    EXEC procfwkHelpers.ImportPropertiesFromJson @json;
+    EXEC procfwkHelpers.ImportPropertiesFromJson @json = @json;
 
-    EXEC procfwkHelpers.ImportTenantsFromJson @json
-                                             ,@dropExisting;
+    EXEC procfwkHelpers.ImportTenantsFromJson @json = @json
+                                             ,@deleteItemsNotInJson = @deleteItemsNotInJson;
 
-    EXEC procfwkHelpers.ImportSubscriptionsFromJson @json
-                                                   ,@dropExisting;
+    EXEC procfwkHelpers.ImportSubscriptionsFromJson @json = @json
+                                                   ,@deleteItemsNotInJson = @deleteItemsNotInJson;
 
-    EXEC procfwkHelpers.ImportOrchestratorsFromJson @json
-                                                   ,@dropExisting;
+    EXEC procfwkHelpers.ImportOrchestratorsFromJson @json = @json
+                                                   ,@deleteItemsNotInJson = @deleteItemsNotInJson;
 
-    EXEC procfwkHelpers.ImportServicePrincipalsFromJson @json
-                                                       ,@dropExisting;
+    EXEC procfwkHelpers.ImportServicePrincipalsFromJson @json = @json
+                                                       ,@deleteItemsNotInJson = @deleteItemsNotInJson;
 
-    EXEC procfwkHelpers.ImportAlertRecipientsFromJson @json
-                                                     ,@dropExisting;
+    EXEC procfwkHelpers.ImportAlertRecipientsFromJson @json = @json
+                                                     ,@deleteItemsNotInJson = @deleteItemsNotInJson;
 
-    EXEC procfwkHelpers.ImportBatchesFromJson @json
-                                             ,@dropExisting;
+    EXEC procfwkHelpers.ImportBatchesFromJson @json = @json
+                                             ,@deleteItemsNotInJson = @deleteItemsNotInJson;
 
-    EXEC procfwkHelpers.ImportStagesFromJson @json
-                                            ,@dropExisting;
+    EXEC procfwkHelpers.ImportStagesFromJson @json = @json
+                                            ,@deleteItemsNotInJson = @deleteItemsNotInJson;
 
-    EXEC procfwkHelpers.ImportBatchStageLinkFromJson @json
-                                                    ,@dropExisting;
+    EXEC procfwkHelpers.ImportBatchStageLinkFromJson @json = @json
+                                                    ,@deleteItemsNotInJson = @deleteItemsNotInJson;
                                                     
-    EXEC procfwkHelpers.ImportPipelinesFromJson @json
-                                               ,@dropExisting;
+    EXEC procfwkHelpers.ImportPipelinesFromJson @json = @json
+                                               ,@deleteItemsNotInJson = @deleteItemsNotInJson;
 
-    EXEC procfwkHelpers.ImportpipelineDependenciesFromJson @json
-                                                          ,@dropExisting;
+    EXEC procfwkHelpers.ImportpipelineDependenciesFromJson @json = @json
+                                                          ,@deleteItemsNotInJson = @deleteItemsNotInJson;
 
-    EXEC procfwkHelpers.ImportPipelineParametersFromJson @json
-                                                        ,@dropExisting;
+    EXEC procfwkHelpers.ImportPipelineParametersFromJson @json = @json
+                                                        ,@deleteItemsNotInJson = @deleteItemsNotInJson;
 
-    EXEC procfwkHelpers.ImportPipelineAlertingFromJson @json
-                                                      ,@dropExisting;
+    EXEC procfwkHelpers.ImportPipelineAlertingFromJson @json = @json
+                                                      ,@deleteItemsNotInJson = @deleteItemsNotInJson;
 
-    EXEC procfwkHelpers.ImportPipelineAuthLinkFromJson @json
-                                                      ,@dropExisting;
+    EXEC procfwkHelpers.ImportPipelineAuthLinkFromJson @json = @json
+                                                      ,@deleteItemsNotInJson = @deleteItemsNotInJson;
                                                           
            
     UPDATE procfwkHelpers.MetadataSnapshot

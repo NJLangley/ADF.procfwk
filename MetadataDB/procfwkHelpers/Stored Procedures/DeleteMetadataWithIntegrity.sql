@@ -1,5 +1,10 @@
 ﻿
 CREATE PROCEDURE [procfwkHelpers].[DeleteMetadataWithIntegrity]
+(
+  @deleteLogs BIT = 1
+ ,@deleteCurrentExecutions BIT = 1
+ ,@reseedIdentity BIT = 1
+)
 AS
 BEGIN
 	/*
@@ -7,25 +12,25 @@ BEGIN
 	*/
 
 	--BatchExecution
-	IF OBJECT_ID(N'[procfwk].[BatchExecution]') IS NOT NULL 
+	IF @deleteCurrentExecutions = 1 AND Object_Id(N'[procfwk].[BatchExecution]') IS NOT NULL 
 		BEGIN
 			TRUNCATE TABLE [procfwk].[BatchExecution];
 		END;
 
 	--CurrentExecution
-	IF OBJECT_ID(N'[procfwk].[CurrentExecution]') IS NOT NULL 
+	IF @deleteCurrentExecutions = 1 AND Object_Id(N'[procfwk].[CurrentExecution]') IS NOT NULL 
 		BEGIN
 			TRUNCATE TABLE [procfwk].[CurrentExecution];
 		END;
 
 	--ExecutionLog
-	IF OBJECT_ID(N'[procfwk].[ExecutionLog]') IS NOT NULL 
+	IF @deleteLogs = 1 AND Object_Id(N'[procfwk].[ExecutionLog]') IS NOT NULL 
 		BEGIN
 			TRUNCATE TABLE [procfwk].[ExecutionLog];
 		END
 
 	--ErrorLog
-	IF OBJECT_ID(N'[procfwk].[ErrorLog]') IS NOT NULL 
+	IF @deleteLogs = 1 AND OBJECT_ID(N'[procfwk].[ErrorLog]') IS NOT NULL 
 		BEGIN
 			TRUNCATE TABLE [procfwk].[ErrorLog];
 		END
@@ -46,21 +51,30 @@ BEGIN
 	IF OBJECT_ID(N'[procfwk].[PipelineDependencies]') IS NOT NULL 
 		BEGIN
 			DELETE FROM [procfwk].[PipelineDependencies];
-			DBCC CHECKIDENT ('[procfwk].[PipelineDependencies]', RESEED, 0);
+			IF @reseedIdentity = 1
+			BEGIN
+				DBCC CHECKIDENT ('[procfwk].[PipelineDependencies]', RESEED, 0);
+			END
 		END;
 
 	--PipelineAlertLink
 	IF OBJECT_ID(N'[procfwk].[PipelineAlertLink]') IS NOT NULL 
 		BEGIN
 			DELETE FROM [procfwk].[PipelineAlertLink];
-			DBCC CHECKIDENT ('[procfwk].[PipelineAlertLink]', RESEED, 0);
+			IF @reseedIdentity = 1
+			BEGIN
+				DBCC CHECKIDENT ('[procfwk].[PipelineAlertLink]', RESEED, 0);
+			END
 		END;
 
 	--Recipients
 	IF OBJECT_ID(N'[procfwk].[Recipients]') IS NOT NULL 
 		BEGIN
 			DELETE FROM [procfwk].[Recipients];
-			DBCC CHECKIDENT ('[procfwk].[Recipients]', RESEED, 0);
+			IF @reseedIdentity = 1
+			BEGIN
+				DBCC CHECKIDENT ('[procfwk].[Recipients]', RESEED, 0);
+			END
 		END;
 
 	--AlertOutcomes
@@ -73,49 +87,70 @@ BEGIN
 	IF OBJECT_ID(N'[procfwk].[PipelineAuthLink]') IS NOT NULL 
 		BEGIN
 			DELETE FROM [procfwk].[PipelineAuthLink];
-			DBCC CHECKIDENT ('[procfwk].[PipelineAuthLink]', RESEED, 0);
+			IF @reseedIdentity = 1
+			BEGIN
+				DBCC CHECKIDENT ('[procfwk].[PipelineAuthLink]', RESEED, 0);
+			END
 		END;
 
 	--ServicePrincipals
 	IF OBJECT_ID(N'[dbo].[ServicePrincipals]') IS NOT NULL 
 		BEGIN
 			DELETE FROM [dbo].[ServicePrincipals];
-			DBCC CHECKIDENT ('[dbo].[ServicePrincipals]', RESEED, 0);
+			IF @reseedIdentity = 1
+			BEGIN
+				DBCC CHECKIDENT ('[dbo].[ServicePrincipals]', RESEED, 0);
+			END
 		END;
 
 	--Properties
 	IF OBJECT_ID(N'[procfwk].[Properties]') IS NOT NULL 
 		BEGIN
 			DELETE FROM [procfwk].[Properties];
-			DBCC CHECKIDENT ('[procfwk].[Properties]', RESEED, 0);
+			IF @reseedIdentity = 1
+			BEGIN
+				DBCC CHECKIDENT ('[procfwk].[Properties]', RESEED, 0);
+			END
 		END;
 
 	--PipelineParameters
 	IF OBJECT_ID(N'[procfwk].[PipelineParameters]') IS NOT NULL 
 		BEGIN
 			DELETE FROM [procfwk].[PipelineParameters];
-			DBCC CHECKIDENT ('[procfwk].[PipelineParameters]', RESEED, 0);
+			IF @reseedIdentity = 1
+			BEGIN
+				DBCC CHECKIDENT ('[procfwk].[PipelineParameters]', RESEED, 0);
+			END
 		END;
 
 	--Pipelines
 	IF OBJECT_ID(N'[procfwk].[Pipelines]') IS NOT NULL 
 		BEGIN
 			DELETE FROM [procfwk].[Pipelines];
-			DBCC CHECKIDENT ('[procfwk].[Pipelines]', RESEED, 0);
+			IF @reseedIdentity = 1
+			BEGIN
+				DBCC CHECKIDENT ('[procfwk].[Pipelines]', RESEED, 0);
+			END
 		END;
 
 	--Orchestrators
 	IF OBJECT_ID(N'[procfwk].[Orchestrators]') IS NOT NULL 
 		BEGIN
 			DELETE FROM [procfwk].[Orchestrators];
-			DBCC CHECKIDENT ('[procfwk].[Orchestrators]', RESEED, 0);
+			IF @reseedIdentity = 1
+			BEGIN
+				DBCC CHECKIDENT ('[procfwk].[Orchestrators]', RESEED, 0);
+			END
 		END;
 
 	--Stages
 	IF OBJECT_ID(N'[procfwk].[Stages]') IS NOT NULL 
 		BEGIN
 			DELETE FROM [procfwk].[Stages];
-			DBCC CHECKIDENT ('[procfwk].[Stages]', RESEED, 0);
+			IF @reseedIdentity = 1
+			BEGIN
+				DBCC CHECKIDENT ('[procfwk].[Stages]', RESEED, 0);
+			END
 		END;
 
 	--Subscriptions

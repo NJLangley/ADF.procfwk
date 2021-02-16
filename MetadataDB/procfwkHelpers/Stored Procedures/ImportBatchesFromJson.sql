@@ -1,7 +1,7 @@
 ﻿CREATE PROCEDURE procfwkHelpers.ImportBatchesFromJson
 (
   @json NVARCHAR(MAX)
- ,@dropExisting BIT = 0
+ ,@deleteItemsNotInJson BIT = 0
 )
 AS
 BEGIN
@@ -51,7 +51,7 @@ BEGIN
                 ,BatchDescription = s.BatchDescription
                 ,Enabled = s.Enabled
     WHEN NOT MATCHED BY SOURCE
-         AND @dropExisting = 1
+         AND @deleteItemsNotInJson = 1
       THEN DELETE
     OUTPUT $action INTO #outputActions;
 

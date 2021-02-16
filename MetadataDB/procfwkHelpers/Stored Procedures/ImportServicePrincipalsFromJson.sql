@@ -1,7 +1,7 @@
 ﻿CREATE PROCEDURE procfwkHelpers.ImportServicePrincipalsFromJson
 (
   @json NVARCHAR(MAX)
- ,@dropExisting BIT = 0
+ ,@deleteItemsNotInJson BIT = 0
 )
 AS
 BEGIN
@@ -54,7 +54,7 @@ BEGIN
                   PrincipalIdUrl = s.PrincipalIdUrl
                 ,PrincipalSecretUrl = s.PrincipalSecretUrl
     WHEN NOT MATCHED BY SOURCE
-          AND @dropExisting = 1
+          AND @deleteItemsNotInJson = 1
       THEN DELETE
     OUTPUT $action INTO #outputActions;
 
