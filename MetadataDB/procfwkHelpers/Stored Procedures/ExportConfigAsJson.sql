@@ -15,12 +15,14 @@ BEGIN
                               ,p.Description AS [description]
                         FROM procfwk.Properties AS p
                         WHERE p.ValidTo IS NULL
+                        ORDER BY p.PropertyName
                         FOR JSON PATH
                        )AS properties
                       ,(SELECT t.TenantId AS tenantId
                               ,t.Name AS [name]
                               ,t.Description AS [description]
                         FROM procfwk.Tenants AS t
+                        ORDER BY tenantId
                         FOR JSON PATH
                        )AS tenants
                       ,(SELECT s.SubscriptionId AS subscriptionId
@@ -28,6 +30,8 @@ BEGIN
                               ,s.Description AS [description]
                               ,s.TenantId AS tenantId
                         FROM procfwk.Subscriptions AS s
+                        ORDER BY s.TenantId
+                                ,s.SubscriptionId
                         FOR JSON PATH
                        )AS subscriptions
                       ,(SELECT o.OrchestratorName AS [name]
@@ -38,6 +42,7 @@ BEGIN
                               ,o.SubscriptionId AS subscriptionId
                               ,o.Description AS [description]
                         FROM procfwk.Orchestrators AS o
+                        ORDER BY o.OrchestratorName
                         FOR JSON PATH
                        )AS orchestrators
                       ,(SELECT sp.PrincipalName AS [name]
@@ -46,6 +51,7 @@ BEGIN
                               ,sp.PrincipalIdUrl AS principalIdKeyVaultUrl
                               ,sp.PrincipalSecretUrl AS secretKeyVaultUrl
                         FROM dbo.ServicePrincipals AS sp
+                        ORDER BY sp.PrincipalName
                         FOR JSON PATH
                        )AS servicePrincipals
                       ,(SELECT r.Name AS [name]
@@ -53,6 +59,7 @@ BEGIN
                               ,r.MessagePreference AS messagePreference
                               ,r.Enabled AS [enabled]
                         FROM procfwk.Recipients AS r
+                        ORDER BY r.EmailAddress
                         FOR JSON PATH
                        )AS alertRecipients
                       ,(SELECT b.BatchId AS id
@@ -64,17 +71,20 @@ BEGIN
                                                            INNER JOIN procfwk.Stages AS s
                                                              ON s.StageId = bsl.StageId
                                                            WHERE bsl.BatchId = b.BatchId
+                                                           ORDER BY bsl.RunOrder
                                                            FOR JSON AUTO
                                                           )
                                         ,'{"stageName":', ''), '}', '')
                                         )AS stages
                         FROM procfwk.Batches AS b
+                        ORDER BY b.BatchId
                         FOR JSON PATH
                        )AS batches
                       ,(SELECT s.StageName AS [name]
                               ,s.StageDescription AS [description]
                               ,s.Enabled AS [enabled]
                         FROM procfwk.Stages AS s
+                        ORDER BY s.StageName
                         FOR JSON PATH
                        )AS stages
                       ,(SELECT --p.PipelineId AS Id
@@ -92,6 +102,7 @@ BEGIN
                                       ,pp.ParameterValue AS parameterValue
                                 FROM procfwk.PipelineParameters AS pp
                                 WHERE pp.PipelineId = p.PipelineId
+                                ORDER BY pp.ParameterName
                                 FOR JSON PATH
                                )AS [parameters]
                               /*
@@ -113,6 +124,7 @@ BEGIN
                                                            INNER JOIN procfwk.Pipelines AS pdn
                                                              ON pdn.PipelineId = pd.PipelineId
                                                            WHERE pd.DependantPipelineId = p.PipelineId
+                                                           ORDER BY pdn.LogicalUsageValue
                                                            FOR JSON PATH
                                                           )
                                          ,'{"LogicalUsageValue":', ''), '}', '')
@@ -122,6 +134,7 @@ BEGIN
                                       ,Json_Query(Replace(Replace((SELECT ao.PipelineOutcomeStatus
                                                                    FROM procfwk.AlertOutcomes AS ao
                                                                    WHERE ao.BitValue = ao.BitValue & pal.OutcomesBitValue
+                                                                   ORDER BY ao.PipelineOutcomeStatus
                                                                    FOR JSON PATH
                                                                   )
                                                  ,'{"PipelineOutcomeStatus":', ''), '}', '')
@@ -130,6 +143,7 @@ BEGIN
                                 INNER JOIN procfwk.Recipients AS r
                                   ON r.RecipientId = pal.RecipientId
                                 WHERE pal.PipelineId = p.PipelineId
+                                ORDER BY r.Name
                                 FOR JSON PATH
                                ) AS alertRecipients
                         FROM procfwk.Pipelines AS p
@@ -142,6 +156,7 @@ BEGIN
                              AND pal.OrchestratorId = p.OrchestratorId
                         LEFT JOIN dbo.ServicePrincipals AS sp
                           ON sp.CredentialId = pal.CredentialId
+                        ORDER BY s.StageName, p.LogicalUsageValue
                         FOR JSON PATH
                        )AS pipelines
                 FOR JSON PATH, WITHOUT_ARRAY_WRAPPER

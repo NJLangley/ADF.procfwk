@@ -5,7 +5,7 @@ BEGIN
   SET XACT_ABORT, NOCOUNT ON;
 
   IF (SELECT Count(1) FROM procfwk.CurrentExecution) > 0
-     OR (SELECT Count(1) FROM procfwk.BatchExecution WHERE BatchStatus = 'Running') > 0
+     OR (SELECT Count(1) FROM procfwk.BatchExecution WHERE BatchStatus IN ('Running', 'Stopped')) > 0
     RETURN 1
   ELSE 
     RETURN 0

@@ -1,7 +1,6 @@
 ﻿CREATE PROCEDURE procfwkHelpers.ImportPipelineAlertingFromJson
 (
   @json NVARCHAR(MAX)
- ,@importIds BIT = 0
  ,@deleteItemsNotInJson BIT = 0
 )
 AS
